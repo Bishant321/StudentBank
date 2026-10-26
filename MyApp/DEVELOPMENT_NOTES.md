@@ -35,6 +35,6 @@ From this folder, the workshop run command is:
 ~/.dotnet/dotnet build -t:Run -f net10.0-android
 ```
 
-The app uses an in-memory task collection for this first shell exercise. Detail navigation passes a `taskId` query parameter; `DetailPage` reads it with `QueryProperty` and looks up the selected task. The starter `.gitignore` excludes `bin/` and `obj/` build output.
+Tasks are stored as JSON in the app's private data folder and loaded on startup. Adding a task or changing its completion status writes the updated collection to disk. Detail navigation passes a `taskId` query parameter; `DetailPage` reads it with `QueryProperty` and looks up the selected task. The starter `.gitignore` excludes `bin/` and `obj/` build output.
 
 The system `dotnet` command resolves to an SDK without MAUI workloads. The user-local SDK at `~/.dotnet/dotnet` already has the Android MAUI workload. The command above built successfully and launched package `com.companyname.myapp` on the `Pixel_6` emulator.

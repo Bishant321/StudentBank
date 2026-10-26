@@ -23,6 +23,7 @@ public partial class AddTaskPage : ContentPage
             Description = DescriptionEditor.Text?.Trim() ?? string.Empty,
             DueDate = DueDatePicker.Date ?? DateTime.Today
         });
+        await TaskStore.SaveAsync();
         await Shell.Current.GoToAsync("..");
     }
 

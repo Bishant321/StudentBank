@@ -23,13 +23,14 @@ public partial class DetailPage : ContentPage
         }
     }
 
-    private void OnToggleCompletedClicked(object? sender, EventArgs e)
+    private async void OnToggleCompletedClicked(object? sender, EventArgs e)
     {
         if (task is null)
             return;
 
         task.IsCompleted = !task.IsCompleted;
         UpdateCompleteButton();
+        await TaskStore.SaveAsync();
     }
 
     private void UpdateCompleteButton() =>

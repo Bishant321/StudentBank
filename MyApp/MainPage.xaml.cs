@@ -6,6 +6,7 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         BindingContext = this;
+        Loaded += async (_, _) => await TaskStore.InitializeAsync();
     }
 
     public System.Collections.ObjectModel.ObservableCollection<TaskItem> Tasks => TaskStore.Tasks;
