@@ -25,10 +25,9 @@ Then open:
 - Swagger UI: http://localhost:5000/swagger
 - Health check: http://localhost:5000/api/health
 
-## Default admin account
+## Administrator setup
 
-- Email: admin@studentbank.local
-- Password: Admin123!
+Set the `StudentBank__AdminEmail` and `StudentBank__AdminPassword` environment variables before starting the app to provision an administrator. Do not commit real credentials to source control.
 
 ## Example requests
 
@@ -64,4 +63,4 @@ curl -X POST http://localhost:5000/api/transfer \
 
 ## Notes
 
-The app stores data in a local SQLite database file named `studentbank.db` in the project folder so data persists between restarts.
+The app stores data in a local SQLite database file named `studentbank.db` in the project folder so data persists between restarts. The database file is local and is not included in this repository.
