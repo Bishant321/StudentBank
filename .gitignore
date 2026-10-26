@@ -1,6 +1,7 @@
 # .NET build output
 **/bin/
 **/obj/
+**/*.SdkResolver.*.proj.Backup.tmp
 
 # Local database and database sidecar files
 **/*.db
