@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.DetailPage"
+             Title="Task details">
+    <VerticalStackLayout Padding="24" Spacing="18">
+        <Label Text="Task details" Style="{StaticResource PageTitleStyle}" />
+        <Label x:Name="TitleLabel" Text="{Binding Title}" FontSize="22" FontAttributes="Bold" TextColor="#18324A" />
+        <Label Text="{Binding Description}" Style="{StaticResource SupportingTextStyle}" />
+        <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+            <Label Text="Due date" FontAttributes="Bold" />
+            <Label Grid.Column="1" Text="{Binding DueLabel}" />
+        </Grid>
+        <Label Text="{Binding StatusLabel}" TextColor="#176B56" />
+        <Button x:Name="CompleteButton" Text="Mark complete" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnToggleCompletedClicked" />
+        <Button Text="Back to tasks" Clicked="OnBackClicked" />
+    </VerticalStackLayout>
+</ContentPage>

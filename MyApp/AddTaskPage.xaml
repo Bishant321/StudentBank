@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.AddTaskPage"
+             Title="Add task">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Label Text="Add a task" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Give the task a name and a due date." Style="{StaticResource SupportingTextStyle}" />
+            <Entry x:Name="TitleEntry" Placeholder="Task name" MaxLength="80" />
+            <Editor x:Name="DescriptionEditor" Placeholder="Description (optional)" AutoSize="TextChanges" />
+            <DatePicker x:Name="DueDatePicker" Date="{Binding Today}" />
+            <Label x:Name="ErrorLabel" Text="Enter a task name first." TextColor="#B42318" IsVisible="False" />
+            <Button Text="Save task" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnSaveClicked" />
+            <Button Text="Cancel" Clicked="OnCancelClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

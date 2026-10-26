@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.MainPage"
+             Title="My Tasks">
+    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="18">
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="My Tasks" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Keep your next steps in one place." Style="{StaticResource SupportingTextStyle}" />
+        </VerticalStackLayout>
+
+        <Button Grid.Row="1" Text="Add a task" Style="{StaticResource PrimaryButtonStyle}"
+                Clicked="OnAddTaskClicked" />
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Tasks}"
+                        SelectionMode="Single" SelectionChanged="OnTaskSelected">
+            <CollectionView.EmptyView>
+                <Label Text="No tasks yet. Add one to get started."
+                       Style="{StaticResource SupportingTextStyle}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="16" Margin="0,0,0,10" Stroke="#DCE3E8" StrokeShape="RoundRectangle 12">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="6">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding Title}"
+                                   FontAttributes="Bold" FontSize="17" TextColor="#18324A" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="{Binding DueLabel}"
+                                   Style="{StaticResource SupportingTextStyle}" />
+                            <Label Grid.RowSpan="2" Grid.Column="1" Text="{Binding StatusLabel}"
+                                   VerticalOptions="Center" FontSize="12" TextColor="#176B56" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

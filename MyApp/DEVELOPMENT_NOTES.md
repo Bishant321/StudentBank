@@ -1,0 +1,40 @@
+# Week 3 workshop preparation
+
+## App shell plan
+
+| Page name | Layout choice | Key controls | Navigates to |
+| --- | --- | --- | --- |
+| Tasks (main) | `Grid` with heading, action row, and a `CollectionView` | Add task button, task cards, due date and status | Add Task; selecting a task opens Task Details |
+| Add Task | `ScrollView` with `VerticalStackLayout` | Name `Entry`, description `Editor`, `DatePicker`, Save and Cancel | Save or Cancel returns to Tasks |
+| Task Details | `VerticalStackLayout` with a small `Grid` for due date | Title, description, status, completion button, Back | Back returns to Tasks |
+
+```mermaid
+flowchart TD
+    Tasks[Tasks list] -->|Add a task| Add[Add Task]
+    Add -->|Save or Cancel| Tasks
+    Tasks -->|Select a task with taskId| Detail[Task Details]
+    Detail -->|Back| Tasks
+```
+
+## Sample project checklist
+
+The two downloaded `maui-samples-main` zip files have the same SHA-256 hash, so one copy is enough. The notes below come from `10.0/Beginners-Series/BeginnersTask` in the zip; it was inspected in place without unpacking the full repository.
+
+- `Platforms/` — Contains platform-specific startup code, manifests, and settings for Android, iOS, Mac Catalyst, Windows, and Tizen.
+- `Resources/` — Holds shared app assets such as images, fonts, icons, splash art, and styles that MAUI packages for each target.
+- `MauiProgram.cs` — Creates the MAUI app, registers `App`, configures fonts and services, and builds the dependency injection container.
+- `App.xaml` and `App.xaml.cs` — Define shared application resources; the code-behind initializes them and opens the app shell in a window.
+- `AppShell.xaml` and `AppShell.xaml.cs` — Declare the root `MainPage` route; the code-behind registers `DetailPage` as a navigation route.
+- `TargetFrameworks` in `BeginnersTask.csproj` — Targets .NET 10 for Android, iOS, and Mac Catalyst, with Windows added conditionally; platform target frameworks control which builds are available.
+
+## Build and development notes
+
+From this folder, the workshop run command is:
+
+```sh
+~/.dotnet/dotnet build -t:Run -f net10.0-android
+```
+
+The app uses an in-memory task collection for this first shell exercise. Detail navigation passes a `taskId` query parameter; `DetailPage` reads it with `QueryProperty` and looks up the selected task. The starter `.gitignore` excludes `bin/` and `obj/` build output.
+
+The system `dotnet` command resolves to an SDK without MAUI workloads. The user-local SDK at `~/.dotnet/dotnet` already has the Android MAUI workload. The command above built successfully and launched package `com.companyname.myapp` on the `Pixel_6` emulator.
