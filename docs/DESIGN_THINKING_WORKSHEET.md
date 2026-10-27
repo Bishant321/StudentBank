@@ -7,7 +7,7 @@ This is a working draft for the technical session. It is based on the StudentBan
 ### Intended users
 
 - Students who need a simple view of their banking accounts and recent activity.
-- Students who track coursework and personal tasks on a phone.
+- Students who want to review example banking information and learn budgeting basics on a phone.
 
 These are target-user assumptions, not findings from interviews.
 
@@ -34,9 +34,9 @@ Record the participant's words and observed actions separately. Do not enter inv
 
 Students need to understand which account and currency they are using before making a transfer, because a combined balance or unclear destination can make it hard to judge what will happen.
 
-### MAUI task app problem statement
+### MAUI mobile banking problem statement
 
-Students need to capture a task, due date, and completion status quickly, and trust that the information remains available after closing the app.
+Students need to understand their account overview and get clear answers to basic budgeting questions, while knowing which information an assistant can see and what actions are only examples.
 
 These are provisional statements. Revise them after collecting student feedback.
 
@@ -47,17 +47,21 @@ These are provisional statements. Revise them after collecting student feedback.
 - Show each account balance with its currency and summarize balances separately by currency.
 - Filter transfer destinations to accounts with a matching currency and explain when a transfer cannot be made.
 - Give users clear success, error, and waiting feedback for actions.
-- Keep task creation short, make due dates and completion states easy to scan, and save tasks locally.
-- Show a busy indicator during Pokémon searches and avoid duplicate requests.
+- Separate accounts and activity into easy-to-scan screens, and label sample balances clearly.
+- Give students an assistant for general money questions while keeping account data out of the assistant request.
+- Keep the Week 3 task app and Week 4 PokéAPI page available as workshop routes.
 
 ### Selected direction
 
-Prioritize clear financial amounts and transfer choices in StudentBank; prioritize quick task entry, persistent task data, and clear search feedback in the MAUI app.
+Prioritize clear sample financial amounts and privacy boundaries in the mobile app; prioritize currency-aware balances and transfer choices in the web app.
 
 ## 4. Prototype
 
 | User need | Prototype decision | Where it appears |
 | --- | --- | --- |
+| Review accounts at a glance | Add Home and Accounts tabs with fictional sample balances and recent activity | `MyApp/MainPage.xaml`, `MyApp/AccountsPage.xaml` |
+| Ask everyday money questions | Add an assistant chat with suggested prompts and a server-side AI integration | `MyApp/AssistantPage.xaml`, `MyApp/Services/BankingAssistantService.cs`, `WebApplication1/Program.cs` |
+| Know what the assistant can access | State that it cannot see accounts or move money; send only the typed question to the model | `MyApp/AssistantPage.xaml`, `WebApplication1/Program.cs` |
 | Understand money by currency | Display balances per currency; format account and transaction amounts using the account currency | `WebApplication1/wwwroot/index.html` |
 | Avoid an incompatible transfer choice | Offer only a different account with the same currency and explain when none is available | `WebApplication1/wwwroot/index.html` |
 | Avoid confusing public dashboard figures | Replace placeholder account/admin counts with a short explanation of the service | `WebApplication1/wwwroot/index.html` |
@@ -71,9 +75,10 @@ Run these tasks with students and record what happened before changing the desig
 
 1. Register, sign in, and open an account in a chosen currency.
 2. Open two accounts in the same currency and make a transfer; identify the source and destination before submitting.
-3. Add a task with a due date, mark it complete, close and reopen the app, and confirm it is still present.
-4. Search for `pikachu`, search for `25`, and try an invalid name while observing whether progress and errors are clear.
-5. Repeat the tasks using keyboard-only navigation and a screen reader where available.
+3. Switch between Home, Accounts, and Assistant; tell what is sample information and which actions move no money.
+4. Ask the assistant a budgeting question, then ask whether it can see account data or make a transfer.
+5. Use the retained workshop pages to add a task and search for `pikachu`, `25`, and an invalid Pokémon name.
+6. Repeat the tasks using keyboard-only navigation and a screen reader where available.
 
 | Task | Where the user hesitated or made an error | What worked | Change to try | Retest result |
 | --- | --- | --- | --- | --- |
@@ -83,6 +88,6 @@ Do not mark the design as user-tested until this table contains observations fro
 
 ## Course alignment
 
-- **Week 3:** The MAUI project has a page plan, Shell routes, task list, add-task/detail pages, shared styles, and `Grid`, `VerticalStackLayout`, and `CollectionView` layouts.
-- **Week 4:** The MAUI project uses PokéAPI through a typed `HttpClient`, response models, and an observable collection displayed in a `CollectionView`.
+- **Week 3:** The MAUI app now uses Shell tabs and `Grid`, `VerticalStackLayout`, and `CollectionView`/bindable layouts. The task list and detail routes remain in the project for the workshop.
+- **Week 4:** The PokéAPI page, typed `HttpClient`, response models, and observable collection remain available as workshop practice.
 - **User-centred design session:** This worksheet is a draft ready to transfer to Miro. Interview evidence and usability-test results remain to be collected.

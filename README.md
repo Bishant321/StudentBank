@@ -60,10 +60,10 @@ curl -X POST http://localhost:5000/api/transfer \
 - `WebApplication1/Program.cs` — API routes, identity, database, services, and auth logic
 - `WebApplication1/wwwroot/index.html` — front-end banking dashboard
 - `WebApplication1/appsettings.json` — connection string and configuration
-- `MyApp/` — .NET MAUI app for the Week 3 app-shell/navigation and Week 4 API exercises
+- `MyApp/` — .NET MAUI StudentBank mobile prototype with Home, Accounts, and AI Assistant tabs; Week 3/4 workshop pages are retained
 - `docs/DESIGN_THINKING_WORKSHEET.md` — draft user-centred design worksheet for both apps
 
-To run the Android MAUI app, change to `MyApp/` and run `dotnet build -t:Run -f net10.0-android` with an Android emulator running. The app saves tasks locally and includes a PokéAPI search page. See `MyApp/DEVELOPMENT_NOTES.md` for the page plan, sample-project checklist, API implementation, and SDK setup notes.
+To run the Android MAUI app, start the StudentBank backend with `OPENAI_API_KEY` configured, listening on port 5080, then change to `MyApp/` and run `~/.dotnet/dotnet build -t:Run -f net10.0-android` with an Android emulator running. The mobile interface uses fictional sample balances and is not connected to the bank database; its general-purpose assistant sends only the user's question to the configured AI service. See `MyApp/DEVELOPMENT_NOTES.md` for setup and course notes.
 
 The worksheet in `docs/` is a draft. It labels user needs as hypotheses and includes tasks for gathering real student feedback; it has not been copied into the linked Miro board or validated with participants.
 

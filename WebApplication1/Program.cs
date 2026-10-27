@@ -1,11 +1,22 @@
 using System.Security.Claims;
+using System.Threading.RateLimiting;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpClient();
+builder.Services.AddRateLimiter(options => options.AddFixedWindowLimiter("assistant", limiter =>
+{
+    limiter.PermitLimit = 12;
+    limiter.Window = TimeSpan.FromMinutes(1);
+    limiter.QueueLimit = 0;
+    limiter.AutoReplenishment = true;
+}));
 
 builder.Services.AddDbContext<BankDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=studentbank.db"));
@@ -54,6 +65,7 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
 {
@@ -144,6 +156,76 @@ app.MapGet("/api/health", () => Results.Ok(new
     timestamp = DateTime.UtcNow,
     database = "sqlite"
 }));
+
+app.MapPost("/api/assistant/chat", async Task<IResult> (
+    AssistantChatRequest request,
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+{
+    var message = request.Message?.Trim();
+    if (string.IsNullOrWhiteSpace(message) || message.Length > 1000)
+    {
+        return Results.BadRequest(new { message = "Write a question of up to 1,000 characters." });
+    }
+
+    var apiKey = configuration["OpenAI:ApiKey"] ?? configuration["OPENAI_API_KEY"];
+    if (string.IsNullOrWhiteSpace(apiKey))
+    {
+        return Results.Problem(
+            title: "AI assistant is not configured",
+            detail: "Set the OPENAI_API_KEY environment variable on the StudentBank server to enable AI replies.",
+            statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+
+    var payload = new
+    {
+        model = configuration["OpenAI:Model"] ?? "gpt-4.1-mini",
+        instructions = "You are the StudentBank learning assistant. Give concise, general educational information about budgeting and everyday banking. You are not a financial adviser. Never ask for passwords, PINs, card numbers, or one-time codes. Do not claim to see account data or execute payments, transfers, or other banking actions. For fraud, lost cards, or account access problems, direct the user to contact their bank through its official app or phone number.",
+        input = message,
+        max_output_tokens = 300
+    };
+
+    try
+    {
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/responses");
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+        httpRequest.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+        using var response = await httpClientFactory.CreateClient().SendAsync(httpRequest, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogWarning("AI assistant provider returned HTTP {StatusCode}.", (int)response.StatusCode);
+            return Results.Problem("The AI assistant could not answer right now. Please try again shortly.", statusCode: StatusCodes.Status502BadGateway);
+        }
+
+        await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var document = await System.Text.Json.JsonDocument.ParseAsync(responseStream, cancellationToken: cancellationToken);
+        var reply = document.RootElement.GetProperty("output")
+            .EnumerateArray()
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "message")
+            .SelectMany(item => item.GetProperty("content").EnumerateArray())
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "output_text")
+            .Select(item => item.GetProperty("text").GetString())
+            .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
+
+        if (string.IsNullOrWhiteSpace(reply))
+        {
+            return Results.Problem("The AI assistant returned an empty reply. Please try again.", statusCode: StatusCodes.Status502BadGateway);
+        }
+
+        return Results.Ok(new { reply });
+    }
+    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+    {
+        return Results.Problem("The request was cancelled.", statusCode: StatusCodes.Status408RequestTimeout);
+    }
+    catch (Exception exception)
+    {
+        logger.LogError(exception, "AI assistant request failed.");
+        return Results.Problem("The AI assistant could not answer right now. Please try again shortly.", statusCode: StatusCodes.Status502BadGateway);
+    }
+}).RequireRateLimiting("assistant");
 
 var authApi = app.MapGroup("/api/auth");
 authApi.MapPost("/register", async (RegisterRequest request, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) =>
@@ -906,4 +988,10 @@ public sealed class TransferResult
 
     [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
+}
+
+public sealed class AssistantChatRequest
+{
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
 }

@@ -1,34 +1,43 @@
+using System.Collections.ObjectModel;
+using MyApp.Models;
+
 namespace MyApp;
 
 public partial class MainPage : ContentPage
 {
+    private bool balanceVisible = true;
+
+    public ObservableCollection<BankTransactionDisplay> Transactions { get; } = new()
+    {
+        new("Campus Cafe", "Today · Food and drink", "−£8.50", "☕", "#263A34"),
+        new("Part-time pay", "Yesterday · Income", "+£320.00", "↙", "#08765B"),
+        new("City Bus", "Mon · Travel", "−£4.80", "▣", "#263A34"),
+        new("Bookshop", "Sun · Study", "−£22.40", "▤", "#263A34")
+    };
+
     public MainPage()
     {
         InitializeComponent();
         BindingContext = this;
-        Loaded += async (_, _) => await TaskStore.InitializeAsync();
     }
 
-    public System.Collections.ObjectModel.ObservableCollection<TaskItem> Tasks => TaskStore.Tasks;
-
-    private async void OnAddTaskClicked(object? sender, EventArgs e)
+    private void OnToggleBalanceClicked(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync(nameof(AddTaskPage));
+        balanceVisible = !balanceVisible;
+        BalanceLabel.Text = balanceVisible ? "£2,450.75" : "••••••••";
+        if (sender is Button button)
+            button.Text = balanceVisible ? "Hide" : "Show";
     }
 
-    private async void OnPokemonClicked(object? sender, EventArgs e)
+    private async void OnActionClicked(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync(nameof(PokemonPage));
+        var action = (sender as Button)?.CommandParameter?.ToString() ?? "This action";
+        await DisplayAlertAsync(action, "This is a coursework demo using sample data. No real money moves in this prototype.", "OK");
     }
 
-    private async void OnTaskSelected(object? sender, SelectionChangedEventArgs e)
-    {
-        if (e.CurrentSelection.FirstOrDefault() is TaskItem task)
-        {
-            if (sender is CollectionView collectionView)
-                collectionView.SelectedItem = null;
+    private async void OnAssistantClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("//Assistant");
 
-            await Shell.Current.GoToAsync($"{nameof(DetailPage)}?taskId={task.Id}");
-        }
-    }
+    private async void OnAccountsClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("//Accounts");
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.AccountsPage"
+             Title="Accounts"
+             BackgroundColor="#F4F7F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="22,24" Spacing="20">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Your accounts" FontSize="28" FontAttributes="Bold" TextColor="#123B32" />
+                <Label Text="A clear view of your sample balances." FontSize="14" TextColor="#64736E" />
+            </VerticalStackLayout>
+
+            <Border Padding="20" BackgroundColor="#08765B" StrokeThickness="0" StrokeShape="RoundRectangle 22">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="EVERYDAY ACCOUNT" FontSize="12" CharacterSpacing="1" TextColor="#D1EFE4" />
+                    <Label Text="£1,820.75" FontSize="30" FontAttributes="Bold" TextColor="White" />
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+                        <Label Text="Sort code  ··  40-21" FontSize="13" TextColor="#D1EFE4" />
+                        <Label Grid.Column="1" Text="•• 4821" FontSize="13" FontAttributes="Bold" TextColor="White" />
+                    </Grid>
+                    <Label Text="Demo balance · Updated just now" FontSize="12" TextColor="#D1EFE4" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="20" BackgroundColor="White" Stroke="#DFE9E4" StrokeShape="RoundRectangle 22">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="STUDENT SAVER" FontSize="12" CharacterSpacing="1" TextColor="#64736E" />
+                    <Label Text="£630.00" FontSize="28" FontAttributes="Bold" TextColor="#123B32" />
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+                        <Label Text="Easy access savings" FontSize="13" TextColor="#64736E" />
+                        <Label Grid.Column="1" Text="•• 1904" FontSize="13" FontAttributes="Bold" TextColor="#31594D" />
+                    </Grid>
+                    <Label Text="Demo balance · No real funds" FontSize="12" TextColor="#64736E" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="16" BackgroundColor="#E7F3EE" StrokeThickness="0" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Demo app" FontSize="14" FontAttributes="Bold" TextColor="#164A3B" />
+                    <Label Text="These example accounts and balances are stored only in the prototype screen. The app is not connected to a bank." FontSize="13" TextColor="#587169" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

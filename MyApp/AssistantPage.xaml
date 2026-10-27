@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:MyApp.Models"
+             x:Class="MyApp.AssistantPage"
+             Title="Assistant"
+             BackgroundColor="#F4F7F6">
+    <Grid Padding="18,16" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="12">
+        <VerticalStackLayout Spacing="3">
+            <Label Text="StudentBank assistant" FontSize="24" FontAttributes="Bold" TextColor="#123B32" />
+            <Label Text="Ask general questions about budgeting and banking." FontSize="13" TextColor="#64736E" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1" Padding="12" BackgroundColor="#FFF5E4" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+            <Label Text="Learning assistant only. It cannot view your accounts or move money. Never share passwords, PINs, or card details. Replies may be wrong." FontSize="12" TextColor="#755619" />
+        </Border>
+
+        <ScrollView Grid.Row="2" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Help me make a budget" Clicked="OnPromptClicked" CommandParameter="Can you help me make a simple student budget?"
+                        BackgroundColor="#E4F2EC" TextColor="#176B56" CornerRadius="18" FontSize="12" Padding="12,8" />
+                <Button Text="Explain overdrafts" Clicked="OnPromptClicked" CommandParameter="Explain how an overdraft works in simple terms."
+                        BackgroundColor="#E4F2EC" TextColor="#176B56" CornerRadius="18" FontSize="12" Padding="12,8" />
+                <Button Text="Saving tips" Clicked="OnPromptClicked" CommandParameter="Give me three practical ways to save as a student."
+                        BackgroundColor="#E4F2EC" TextColor="#176B56" CornerRadius="18" FontSize="12" Padding="12,8" />
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <CollectionView x:Name="MessagesView" Grid.Row="3" ItemsSource="{Binding Messages}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="Ask a question to get started." TextColor="#64736E" HorizontalOptions="Center" VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:AssistantChatMessage">
+                    <Border Padding="13" Margin="0,0,0,10" StrokeThickness="0" StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#E4F2EC" HorizontalOptions="Start" MaximumWidthRequest="340">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsUser}" Value="True">
+                                <Setter Property="BackgroundColor" Value="#08765B" />
+                                <Setter Property="HorizontalOptions" Value="End" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Sender}" FontSize="11" FontAttributes="Bold" TextColor="#497164">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsUser}" Value="True">
+                                        <Setter Property="TextColor" Value="#D1EFE4" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Text="{Binding Text}" FontSize="14" TextColor="#193D33" LineBreakMode="WordWrap">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsUser}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ActivityIndicator x:Name="ReplyIndicator" Grid.Row="4" IsVisible="False" IsRunning="False"
+                           Color="#08765B" HorizontalOptions="Start"
+                           SemanticProperties.Description="Assistant is writing a reply" />
+        <Grid Grid.Row="5" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry x:Name="MessageEntry" Placeholder="Ask a question…" MaxLength="1000"
+                   ReturnType="Send" Completed="OnSendClicked"
+                   SemanticProperties.Description="Question for the banking assistant" />
+            <Button Grid.Column="1" x:Name="SendButton" Text="Send" Clicked="OnSendClicked"
+                    Style="{StaticResource PrimaryButtonStyle}" Padding="17,10" />
+        </Grid>
+    </Grid>
+</ContentPage>
