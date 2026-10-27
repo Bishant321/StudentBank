@@ -60,9 +60,9 @@ curl -X POST http://localhost:5000/api/transfer \
 - `WebApplication1/Program.cs` — API routes, identity, database, services, and auth logic
 - `WebApplication1/wwwroot/index.html` — front-end banking dashboard
 - `WebApplication1/appsettings.json` — connection string and configuration
-- `MyApp/` — .NET MAUI task app used for the Week 3 app-shell and navigation exercise
+- `MyApp/` — .NET MAUI app for the Week 3 app-shell/navigation and Week 4 API exercises
 
-To run the Android MAUI app, change to `MyApp/` and run `dotnet build -t:Run -f net10.0-android` with an Android emulator running. See `MyApp/DEVELOPMENT_NOTES.md` for the page plan, sample-project checklist, and SDK setup notes.
+To run the Android MAUI app, change to `MyApp/` and run `dotnet build -t:Run -f net10.0-android` with an Android emulator running. The app saves tasks locally and includes a PokéAPI search page. See `MyApp/DEVELOPMENT_NOTES.md` for the page plan, sample-project checklist, API implementation, and SDK setup notes.
 
 ## Notes
 
