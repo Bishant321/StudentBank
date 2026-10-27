@@ -27,10 +27,16 @@ public partial class PokemonPage : ContentPage
 
         ErrorLabel.IsVisible = false;
         SearchEntry.IsEnabled = false;
+        SearchButton.IsEnabled = false;
+        SearchActivityIndicator.IsVisible = true;
+        SearchActivityIndicator.IsRunning = true;
 
         try
         {
             var result = await pokemonService.GetPokemonAsync(query);
+            var existingResult = PokemonResults.FirstOrDefault(pokemon => pokemon.Id == result.Id);
+            if (existingResult is not null)
+                PokemonResults.Remove(existingResult);
             PokemonResults.Insert(0, result);
         }
         catch (KeyNotFoundException exception)
@@ -51,6 +57,9 @@ public partial class PokemonPage : ContentPage
         finally
         {
             SearchEntry.IsEnabled = true;
+            SearchButton.IsEnabled = true;
+            SearchActivityIndicator.IsRunning = false;
+            SearchActivityIndicator.IsVisible = false;
         }
     }
 }

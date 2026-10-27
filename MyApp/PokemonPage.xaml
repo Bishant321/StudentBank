@@ -12,13 +12,20 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
             <Entry x:Name="SearchEntry" Placeholder="Try pikachu or 25"
+                   SemanticProperties.Description="Pokémon name or Pokédex number"
+                   SemanticProperties.Hint="For example, Pikachu or 25."
                    ReturnType="Search" Completed="OnSearchClicked" />
-            <Button Grid.Column="1" Text="Search" Clicked="OnSearchClicked"
+            <Button x:Name="SearchButton" Grid.Column="1" Text="Search" Clicked="OnSearchClicked"
+                    SemanticProperties.Description="Search for a Pokémon"
                     BackgroundColor="#007A63" TextColor="White" CornerRadius="12" />
         </Grid>
 
-        <Label x:Name="ErrorLabel" Grid.Row="2" IsVisible="False"
-               TextColor="#B42318" />
+        <VerticalStackLayout Grid.Row="2" Spacing="8">
+            <ActivityIndicator x:Name="SearchActivityIndicator" IsVisible="False" IsRunning="False"
+                               SemanticProperties.Description="Searching PokéAPI" />
+            <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#B42318"
+                   SemanticProperties.Description="Search message" />
+        </VerticalStackLayout>
 
         <CollectionView Grid.Row="3" ItemsSource="{Binding PokemonResults}">
             <CollectionView.EmptyView>

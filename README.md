@@ -1,6 +1,6 @@
 # StudentBank
 
-A secure ASP.NET Core banking system with a web front end, SQLite storage, cookie-based authentication, and admin-only reporting.
+A student banking coursework prototype built with ASP.NET Core, SQLite, cookie-based authentication, and admin-only reporting. It is for demonstration with fictional data, not a real financial service.
 
 ## Features
 
@@ -61,8 +61,11 @@ curl -X POST http://localhost:5000/api/transfer \
 - `WebApplication1/wwwroot/index.html` — front-end banking dashboard
 - `WebApplication1/appsettings.json` — connection string and configuration
 - `MyApp/` — .NET MAUI app for the Week 3 app-shell/navigation and Week 4 API exercises
+- `docs/DESIGN_THINKING_WORKSHEET.md` — draft user-centred design worksheet for both apps
 
 To run the Android MAUI app, change to `MyApp/` and run `dotnet build -t:Run -f net10.0-android` with an Android emulator running. The app saves tasks locally and includes a PokéAPI search page. See `MyApp/DEVELOPMENT_NOTES.md` for the page plan, sample-project checklist, API implementation, and SDK setup notes.
+
+The worksheet in `docs/` is a draft. It labels user needs as hypotheses and includes tasks for gathering real student feedback; it has not been copied into the linked Miro board or validated with participants.
 
 ## Notes
 

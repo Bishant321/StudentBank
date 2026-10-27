@@ -44,4 +44,6 @@ Tasks are stored as JSON in the app's private data folder and loaded on startup.
 
 The Pokémon Finder uses PokéAPI's `pokemon/{name-or-id}` endpoint. `Pokemon` and its nested type models map the JSON response. `PokemonService` calls `GetFromJsonAsync<Pokemon>()` through a typed `HttpClient`, registered in `MauiProgram.cs` with the API base address. The page displays results in an `ObservableCollection<Pokemon>` bound to a `CollectionView`, and reports not-found and connection errors. The Android manifest includes internet access permission. Search with a name such as `pikachu` or a Pokédex number such as `25`.
 
+The page shows a progress indicator while searching, disables repeated searches, and gives the search field an accessibility description and hint. The wider design-thinking worksheet for StudentBank and this app is in `docs/DESIGN_THINKING_WORKSHEET.md` at the repository root. It is a draft until students complete interviews and usability sessions.
+
 The system `dotnet` command resolves to an SDK without MAUI workloads. The user-local SDK at `~/.dotnet/dotnet` has the Android MAUI workload. After syncing the Week 4 API changes into `~/MyApp`, the Android build completed with zero warnings and errors, and the app process was confirmed running on the Pixel 6 emulator.
