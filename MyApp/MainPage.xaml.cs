@@ -16,6 +16,11 @@ public partial class MainPage : ContentPage
         await Shell.Current.GoToAsync(nameof(AddTaskPage));
     }
 
+    private async void OnPokemonClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(PokemonPage));
+    }
+
     private async void OnTaskSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is TaskItem task)

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MyApp.MainPage"
              Title="My Tasks">
-    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="18">
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
         <VerticalStackLayout Grid.Row="0" Spacing="4">
             <Label Text="My Tasks" Style="{StaticResource PageTitleStyle}" />
             <Label Text="Keep your next steps in one place." Style="{StaticResource SupportingTextStyle}" />
@@ -12,7 +12,10 @@
         <Button Grid.Row="1" Text="Add a task" Style="{StaticResource PrimaryButtonStyle}"
                 Clicked="OnAddTaskClicked" />
 
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Tasks}"
+        <Button Grid.Row="2" Text="Explore Pokémon" Clicked="OnPokemonClicked"
+                BackgroundColor="#E8F3F1" TextColor="#176B56" CornerRadius="12" />
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Tasks}"
                         SelectionMode="Single" SelectionChanged="OnTaskSelected">
             <CollectionView.EmptyView>
                 <Label Text="No tasks yet. Add one to get started."

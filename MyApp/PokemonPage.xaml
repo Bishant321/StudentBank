@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.PokemonPage"
+             Title="Pokémon">
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="16">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Pokémon finder" Style="{StaticResource PageTitleStyle}" />
+            <Label Text="Search PokéAPI by name or Pokédex number."
+                   Style="{StaticResource SupportingTextStyle}" />
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry x:Name="SearchEntry" Placeholder="Try pikachu or 25"
+                   ReturnType="Search" Completed="OnSearchClicked" />
+            <Button Grid.Column="1" Text="Search" Clicked="OnSearchClicked"
+                    BackgroundColor="#007A63" TextColor="White" CornerRadius="12" />
+        </Grid>
+
+        <Label x:Name="ErrorLabel" Grid.Row="2" IsVisible="False"
+               TextColor="#B42318" />
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding PokemonResults}">
+            <CollectionView.EmptyView>
+                <Label Text="Search for a Pokémon to see its details."
+                       Style="{StaticResource SupportingTextStyle}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="18" Margin="0,0,0,10" Stroke="#DCE3E8"
+                            StrokeShape="RoundRectangle 12">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding DisplayName}" FontSize="22"
+                                   FontAttributes="Bold" TextColor="#18324A" />
+                            <Label Text="{Binding TypesLabel, StringFormat='Types: {0}'}" TextColor="#176B56" />
+                            <Grid ColumnDefinitions="*,*">
+                                <Label Text="{Binding Height, StringFormat='Height: {0} dm'}"
+                                       Style="{StaticResource SupportingTextStyle}" />
+                                <Label Grid.Column="1" Text="{Binding Weight, StringFormat='Weight: {0} hg'}"
+                                       Style="{StaticResource SupportingTextStyle}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
