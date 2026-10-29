@@ -14,7 +14,7 @@ export TRUELAYER_REDIRECT_URI="https://console.truelayer.com/redirect-page"
 export ALPHA_VANTAGE_API_KEY="your-market-data-key"
 ```
 
-Create a TrueLayer sandbox application and configure the same redirect URI in its dashboard. The app opens the provider consent page; for this prototype, copy the returned authorization code from the redirect page and paste it into Accounts. The server validates the OAuth state and exchanges the code. The sandbox access token is held in server memory, so reconnect after a server restart or token expiry. Disconnect removes the in-memory token.
+Create a TrueLayer sandbox application and configure the same redirect URI in its dashboard. The app opens the provider consent page; use the Mock Bank test login (`john` / `doe`), then copy the returned authorization code from the redirect page and paste it into Accounts. The server validates the OAuth state and exchanges the code. The sandbox access token is held in server memory, so reconnect after a server restart or token expiry. Disconnect removes the in-memory token.
 
 The external bank connection requests read-only account, balance, and transaction scopes. It is not production bank access and does not send payments. The user must explicitly approve the provider consent screen. Production Open Banking access requires an eligible regulated/registered provider and provider approval. Do not ask users to give StudentBank their bank password.
 

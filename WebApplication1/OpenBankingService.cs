@@ -26,7 +26,7 @@ public sealed class OpenBankingService(HttpClient httpClient, IConfiguration con
             ["client_id"] = clientId,
             ["redirect_uri"] = redirectUri,
             ["scope"] = "info accounts balance transactions",
-            ["providers"] = "uk-ob-all",
+            ["providers"] = "uk-cs-mock",
             ["state"] = state
         };
         var url = $"{AuthHost}/?{string.Join("&", query.Select(pair => $"{Uri.EscapeDataString(pair.Key)}={Uri.EscapeDataString(pair.Value)}"))}";
