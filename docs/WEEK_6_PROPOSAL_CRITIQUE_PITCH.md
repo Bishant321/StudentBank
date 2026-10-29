@@ -116,6 +116,21 @@ While they work, stay quiet. Record what they do, where they pause, any errors, 
 
 The sessions have not been conducted yet. Do not describe the proposed questions or likely answers as participant feedback.
 
+#### Desk-review answers and design notes (not student feedback)
+
+These notes answer the interview topics only from the app files and screens. They describe the current prototype; they do not tell us what Ramesh, Shiva, Bibashu, or other students think.
+
+| Topic | What the current prototype shows | Analysis / next step |
+| --- | --- | --- |
+| What can a user check first? | Home puts a £2,450.75 total balance first, followed by quick actions and recent activity. Accounts lists two GBP demo balances, £1,820.75 and £630.00; they add up to the total. | The screen hierarchy is clear in the code. Ask participants whether total balance or separate accounts is more useful to them. |
+| Is the information sample or live? | Home says “Sample balance · Demo account”; Accounts says “A clear view of your sample balances” and explains the app is not connected to a bank. | Good prototype disclosure. However, Accounts also says “Updated just now” while the displayed value is static demo data. Remove that freshness claim or explain what it refers to. |
+| Can a user understand recent activity? | Home shows four sample transactions with merchant, category/date, and amount. | The balance card identifies the screen as a demo, but mark the activity itself as sample too. Test whether participants understand that amounts are fictional. |
+| What actions appear available? | Send, Add, and Cards buttons open a dialog explaining that no real money moves. | They look like real banking actions before the dialog appears. Consider labeling them as previews or replacing them with non-action examples until implemented; ask participants what they expect each button to do. |
+| What does the assistant claim and receive? | The Assistant screen says it cannot access accounts or move money and warns users not to share secrets. The server request contains the typed question and does not attach account balances or identifiers. | The boundary is stated clearly in the interface and code. Verify through a participant task whether the wording is understood; also test the unconfigured-server and connection-error states. |
+| Does the current code show real student context or usability? | No interviews, participant observations, task-completion results, or peer critique are present in the repository. | The app files cannot establish where students use banking apps, what they need first, or whether they find this prototype easy. Collect those answers directly and then update the blank P1–P3 forms. |
+
+**Design-review summary:** the prototype communicates that balances are examples and that the assistant is not account-aware. The clearest fix from inspecting the current screens is to remove the misleading “Updated just now” wording and label recent activity as sample. Treat these as code-review recommendations, not user-validated changes.
+
 ### Peer critique log
 
 Record feedback using “I like / I wish / What if,” name the design lens, then decide whether to accept, adapt, or reject it with a reason. No peer feedback has been supplied yet.
