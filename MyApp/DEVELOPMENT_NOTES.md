@@ -69,3 +69,7 @@ The Pokémon Finder uses PokéAPI's `pokemon/{name-or-id}` endpoint. `Pokemon` a
 The page shows a progress indicator while searching, disables repeated searches, and gives the search field an accessibility description and hint. The PokéAPI page remains in the project as workshop practice, but Home is now the app's starting screen. The wider design-thinking worksheet for StudentBank and this app is in `docs/DESIGN_THINKING_WORKSHEET.md` at the repository root.
 
 The system `dotnet` command may resolve to an SDK without MAUI workloads. The user-local SDK at `~/.dotnet/dotnet` has the Android MAUI workload.
+
+## Week 6 proposal and feasibility work
+
+See [`../docs/WEEK_6_PROPOSAL_CRITIQUE_PITCH.md`](../docs/WEEK_6_PROPOSAL_CRITIQUE_PITCH.md) for the proposal draft, architecture map, prioritized scope, critique and usability evidence templates, technical risk register, and Week 6–12 plan. The Android emulator run demonstrates the MAUI shell, but does not verify the mobile banking screens against the web banking database. The highest-priority open technical question is whether the MAUI client can securely read the signed-in user's accounts from the existing API. Record the result of that spike here when it has been run. Do not fill in interview or critique logs without actual participant feedback.

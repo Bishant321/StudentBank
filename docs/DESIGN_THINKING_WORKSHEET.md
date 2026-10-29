@@ -91,3 +91,4 @@ Do not mark the design as user-tested until this table contains observations fro
 - **Week 3:** The MAUI app now uses Shell tabs and `Grid`, `VerticalStackLayout`, and `CollectionView`/bindable layouts. The task list and detail routes remain in the project for the workshop.
 - **Week 4:** The PokéAPI page, typed `HttpClient`, response models, and observable collection remain available as workshop practice.
 - **User-centred design session:** This worksheet is a draft ready to transfer to Miro. Interview evidence and usability-test results remain to be collected.
+- **Week 6 proposal, critique and pitch:** See [the Week 6 proposal document](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md) for the slide requirements mapped to this prototype, draft MoSCoW priorities, technical risks, a phased plan, and feedback templates. The user research and peer critique tables remain unfilled until real sessions take place.
