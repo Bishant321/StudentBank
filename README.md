@@ -63,6 +63,7 @@ curl -X POST http://localhost:5000/api/transfer \
 - `MyApp/` — .NET MAUI StudentBank mobile prototype with Home, Accounts, and AI Assistant tabs; Week 3/4 workshop pages are retained
 - `docs/DESIGN_THINKING_WORKSHEET.md` — draft user-centred design worksheet for both apps
 - `docs/WEEK_6_PROPOSAL_CRITIQUE_PITCH.md` — Week 6 proposal, project alignment, draft priorities, technical risks, phased plan, and pitch outline
+- `docs/COURSE_WEEK_ALIGNMENT.md` — course materials shared so far mapped to the project, with evidence gaps by week
 
 To run the Android MAUI app, start the StudentBank backend with `OPENAI_API_KEY` configured, listening on port 5080, then change to `MyApp/` and run `~/.dotnet/dotnet build -t:Run -f net10.0-android` with an Android emulator running. The mobile interface uses fictional sample balances and is not connected to the bank database; its general-purpose assistant sends only the user's question to the configured AI service. See `MyApp/DEVELOPMENT_NOTES.md` for setup and course notes.
 
