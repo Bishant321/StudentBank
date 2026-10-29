@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.MarketsPage"
+             Title="Markets"
+             BackgroundColor="#F4F7F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="18,20" Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Market learning" FontSize="26" FontAttributes="Bold" TextColor="#123B32" />
+                <Label Text="Look up a public market quote and ask the assistant to explain its fields." FontSize="14" TextColor="#64736E" />
+            </VerticalStackLayout>
+
+            <Border Padding="15" BackgroundColor="White" Stroke="#DCE7E3" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Market quote" FontSize="18" FontAttributes="Bold" TextColor="#123B32" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry x:Name="SymbolEntry" Text="IBM" Placeholder="Symbol, e.g. IBM" MaxLength="10" />
+                        <Button Grid.Column="1" Text="Get quote" Clicked="OnGetQuoteClicked" BackgroundColor="#08765B" TextColor="White" CornerRadius="12" Padding="14,10" />
+                    </Grid>
+                    <ActivityIndicator x:Name="QuoteIndicator" IsVisible="False" IsRunning="False" Color="#08765B" HorizontalOptions="Start" />
+                    <VerticalStackLayout x:Name="QuotePanel" IsVisible="False" Spacing="5">
+                        <Label x:Name="QuoteTitle" FontSize="22" FontAttributes="Bold" TextColor="#123B32" />
+                        <Label x:Name="QuoteNumbers" FontSize="15" TextColor="#193D33" />
+                        <Label x:Name="QuoteDate" FontSize="12" TextColor="#64736E" />
+                        <Label x:Name="QuoteNotice" FontSize="12" TextColor="#755619" />
+                    </VerticalStackLayout>
+                    <Label x:Name="QuoteError" IsVisible="False" FontSize="13" TextColor="#A33A32" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="15" BackgroundColor="White" Stroke="#DCE7E3" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Ask about this quote" FontSize="18" FontAttributes="Bold" TextColor="#123B32" />
+                    <Entry x:Name="QuestionEntry" Text="What does the daily change mean?" Placeholder="Ask a general question" MaxLength="500" />
+                    <Button Text="Explain with AI" Clicked="OnExplainClicked" BackgroundColor="#E4F2EC" TextColor="#176B56" CornerRadius="12" />
+                    <ActivityIndicator x:Name="ExplainIndicator" IsVisible="False" IsRunning="False" Color="#08765B" HorizontalOptions="Start" />
+                    <Label x:Name="ExplanationLabel" IsVisible="False" TextColor="#193D33" FontSize="14" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="12" BackgroundColor="#FFF5E4" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                <Label Text="Educational prototype. Quotes can be delayed and may not be executable. No trading orders are placed. The assistant does not give buy, sell, or hold recommendations." FontSize="12" TextColor="#755619" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

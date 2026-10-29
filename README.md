@@ -60,12 +60,12 @@ curl -X POST http://localhost:5000/api/transfer \
 - `WebApplication1/Program.cs` — API routes, identity, database, services, and auth logic
 - `WebApplication1/wwwroot/index.html` — front-end banking dashboard
 - `WebApplication1/appsettings.json` — connection string and configuration
-- `MyApp/` — .NET MAUI StudentBank mobile prototype with Home, Accounts, and AI Assistant tabs; Week 3/4 workshop pages are retained
+- `MyApp/` — .NET MAUI StudentBank coursework prototype with sign-in, authenticated demo accounts/transfers, read-only TrueLayer sandbox data, transaction insights with explicit consent, market quotes and AI explanations; Week 3/4 workshop pages are retained
 - `docs/DESIGN_THINKING_WORKSHEET.md` — draft user-centred design worksheet for both apps
 - `docs/WEEK_6_PROPOSAL_CRITIQUE_PITCH.md` — Week 6 proposal, project alignment, draft priorities, technical risks, phased plan, and pitch outline
 - `docs/COURSE_WEEK_ALIGNMENT.md` — course materials shared so far mapped to the project, with evidence gaps by week
 
-To run the Android MAUI app, start the StudentBank backend with `OPENAI_API_KEY` configured, listening on port 5080, then change to `MyApp/` and run `~/.dotnet/dotnet build -t:Run -f net10.0-android` with an Android emulator running. The mobile interface uses fictional sample balances and is not connected to the bank database; its general-purpose assistant sends only the user's question to the configured AI service. See `MyApp/DEVELOPMENT_NOTES.md` for setup and course notes.
+To run the Android MAUI app, configure provider keys on the server, start the StudentBank backend listening on port 5080, and then run `~/.dotnet/dotnet build -t:Run -f net10.0-android` in `MyApp/` with an Android emulator running. See `MyApp/DEVELOPMENT_NOTES.md` for provider setup. Internal account balances are fictional coursework ledger data stored in SQLite. TrueLayer access uses its sandbox, read-only scopes, and explicit provider consent; no external bank payments are made. Market quotes depend on provider entitlements and may be delayed.
 
 The worksheet in `docs/` is a draft. It labels user needs as hypotheses and includes tasks for gathering real student feedback; it has not been copied into the linked Miro board or validated with participants.
 

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.DependencyInjection;
 using MyApp.Models;
 using MyApp.Services;
 
@@ -7,6 +8,7 @@ namespace MyApp;
 public partial class AssistantPage : ContentPage
 {
     private readonly BankingAssistantService assistantService = new();
+    private readonly BankingApiClient bankingApi = App.ServiceProvider.GetRequiredService<BankingApiClient>();
     private bool isSending;
 
     public ObservableCollection<AssistantChatMessage> Messages { get; } = new()
@@ -29,6 +31,42 @@ public partial class AssistantPage : ContentPage
     {
         if (sender is Button button)
             await SendQuestionAsync(button.CommandParameter?.ToString());
+    }
+
+    private async void OnInsightsClicked(object? sender, EventArgs e)
+    {
+        if (!TransactionConsentCheckBox.IsChecked)
+        {
+            await DisplayAlertAsync("Consent needed", "Choose the consent checkbox before requesting insights from connected transaction summaries.", "OK");
+            return;
+        }
+
+        var question = InsightsQuestionEntry.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(question))
+            question = "Describe my spending by category and suggest a few practical budgeting questions I can consider.";
+
+        if (isSending) return;
+        isSending = true;
+        ReplyIndicator.IsVisible = true;
+        ReplyIndicator.IsRunning = true;
+        Messages.Add(new AssistantChatMessage("You · transaction insights", question, true));
+        ScrollToLatest();
+        try
+        {
+            var reply = await bankingApi.GetSpendingInsightsAsync(question, consent: true);
+            Messages.Add(new AssistantChatMessage("StudentBank insights", reply, false));
+        }
+        catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or TaskCanceledException)
+        {
+            Messages.Add(new AssistantChatMessage("Insights unavailable", exception.Message, false));
+        }
+        finally
+        {
+            isSending = false;
+            ReplyIndicator.IsRunning = false;
+            ReplyIndicator.IsVisible = false;
+            ScrollToLatest();
+        }
     }
 
     private async Task SendQuestionAsync(string? question)

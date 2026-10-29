@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyApp.TransferPage"
+             Title="Transfer"
+             BackgroundColor="#F4F7F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Label Text="Transfer between your demo accounts" FontSize="25" FontAttributes="Bold" TextColor="#123B32" />
+            <Label Text="This updates the StudentBank coursework ledger only. It does not send money to a real bank." FontSize="13" TextColor="#64736E" />
+            <Label Text="From account" FontAttributes="Bold" TextColor="#31594D" />
+            <Picker x:Name="FromPicker" Title="Choose source account" ItemDisplayBinding="{Binding DisplayName}" SelectedIndexChanged="OnFromChanged" />
+            <Label Text="To account" FontAttributes="Bold" TextColor="#31594D" />
+            <Picker x:Name="ToPicker" Title="Choose destination account" ItemDisplayBinding="{Binding DisplayName}" />
+            <Entry x:Name="AmountEntry" Placeholder="Amount" Keyboard="Numeric" />
+            <Entry x:Name="DescriptionEntry" Placeholder="Reference (optional)" MaxLength="80" />
+            <Button Text="Review transfer" Clicked="OnReviewTransferClicked" Style="{StaticResource PrimaryButtonStyle}" HeightRequest="52" />
+            <Label x:Name="StatusLabel" FontSize="13" TextColor="#A33A32" IsVisible="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

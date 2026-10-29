@@ -1,15 +1,31 @@
 # StudentBank mobile app
 
-The MAUI project is now a mobile banking coursework prototype. Its Shell tabs lead to Home, Accounts, and Assistant. The balances and transactions are fictional display data: account actions do not move money and the phone app is not connected to the banking database.
+The MAUI project is a coursework prototype with sign-in, server-backed StudentBank demo accounts, internal demo transfers, a TrueLayer sandbox read-only connection, transaction insights with per-request consent, market quote lookup, and AI explanations. StudentBank transfers move only fictional balances in the local SQLite database. TrueLayer is configured for sandbox account information, and does not support payment initiation here.
 
-## Mobile assistant setup
+## Configure providers on macOS
 
-The Assistant tab calls `POST /api/assistant/chat` on the StudentBank ASP.NET server. The server sends only the typed question to the OpenAI Responses API; it does not attach balances, transactions, or account identifiers. The API key stays on the server and must be configured as `OPENAI_API_KEY`. Without that key, the app shows a setup message. Replies are general educational information and should not be treated as financial advice.
-
-For the Android emulator, start the backend from the repository root so it listens on port 5080:
+Keep provider credentials on the backend; never add them to the MAUI app or commit them. Set the following environment variables in the terminal that starts the backend:
 
 ```sh
-OPENAI_API_KEY="your-server-side-key" dotnet run --project WebApplication1 --urls http://0.0.0.0:5080
+export OPENAI_API_KEY="your-server-side-key"
+export TRUELAYER_CLIENT_ID="your-TrueLayer-sandbox-client-id"
+export TRUELAYER_CLIENT_SECRET="your-TrueLayer-sandbox-client-secret"
+export TRUELAYER_REDIRECT_URI="https://console.truelayer.com/redirect-page"
+export ALPHA_VANTAGE_API_KEY="your-market-data-key"
+```
+
+Create a TrueLayer sandbox application and configure the same redirect URI in its dashboard. The app opens the provider consent page; for this prototype, copy the returned authorization code from the redirect page and paste it into Accounts. The server validates the OAuth state and exchanges the code. The sandbox access token is held in server memory, so reconnect after a server restart or token expiry. Disconnect removes the in-memory token.
+
+The external bank connection requests read-only account, balance, and transaction scopes. It is not production bank access and does not send payments. The user must explicitly approve the provider consent screen. Production Open Banking access requires an eligible regulated/registered provider and provider approval. Do not ask users to give StudentBank their bank password.
+
+Alpha Vantage provides market quote data for the Markets screen; available timing and request quotas depend on the account entitlement. Quotes may be delayed. No orders are placed. The AI market explanation is educational and does not provide investment advice.
+
+The Assistant tab's general chat sends only the typed question to the OpenAI Responses API. Transaction insights are separate: the user must check the consent box for each request. The server sends only aggregated outgoing totals and transaction counts by category and currency for the previous 30 days; merchant names and account identifiers are excluded. Replies are educational, can be wrong, and are not financial advice.
+
+For the Android emulator, start the backend from the repository root so it listens on port 5080, after configuring the credentials above:
+
+```sh
+dotnet run --project WebApplication1 --urls http://0.0.0.0:5080
 ```
 
 In a second terminal, start the Android app from `MyApp/`:
@@ -18,7 +34,7 @@ In a second terminal, start the Android app from `MyApp/`:
 ~/.dotnet/dotnet build -t:Run -f net10.0-android
 ```
 
-The Android app uses cleartext HTTP to reach the local development server. This is for the emulator prototype; use HTTPS and authenticated, rate-limited infrastructure before any public deployment. The server currently limits assistant requests to 12 per minute.
+The Android app uses cleartext HTTP to reach the local development server. This is for the emulator prototype; use HTTPS and authenticated, rate-limited infrastructure before any public deployment. Assistant requests are limited to 12 per minute and market quotes to 5 per minute per server policy.
 
 ## Week 3 shell and navigation
 
@@ -26,9 +42,10 @@ The Android app uses cleartext HTTP to reach the local development server. This 
 
 | Page name | Layout choice | Key controls | Navigates to |
 | --- | --- | --- | --- |
-| StudentBank Home | `ScrollView`, `Grid`, `VerticalStackLayout`, and bindable transaction rows | Sample balance, quick actions, recent activity, Assistant shortcut | Accounts; Assistant |
-| Accounts | `ScrollView` with account cards | Two fictional account balances and masked account references | Home; Assistant through Shell tabs |
-| Assistant | `Grid` with prompt chips, `CollectionView` conversation, and message `Entry` | Learning prompts, loading feedback, general banking questions | Home; Accounts through Shell tabs |
+| StudentBank Home | `ScrollView`, `Grid`, `VerticalStackLayout`, and bindable transaction rows | Authenticated demo-ledger balance and recent activity, quick actions, Assistant shortcut | Accounts; Transfer; Assistant |
+| Accounts | `ScrollView` with account cards and collection views | Authenticated demo accounts, create account, TrueLayer sandbox connection and recent external transactions | Home; Assistant through Shell tabs |
+| Assistant | `Grid` with prompt chips, `CollectionView` conversation, message `Entry`, and explicit consent panel | General banking education; opt-in aggregate transaction insights; loading feedback | Home; Accounts through Shell tabs |
+| Markets | `ScrollView` with quote card and explanation panel | Symbol search, external quote fields, educational AI explanation | Home; Assistant through Shell tabs |
 | Tasks (workshop page) | `Grid` with heading, action row, and a `CollectionView` | Add task button, task cards, due date and status | Add Task; selecting a task opens Task Details |
 | Add Task | `ScrollView` with `VerticalStackLayout` | Name `Entry`, description `Editor`, `DatePicker`, Save and Cancel | Save or Cancel returns to Tasks |
 | Task Details | `VerticalStackLayout` with a small `Grid` for due date | Title, description, status, completion button, Back | Back returns to Tasks |

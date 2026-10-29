@@ -10,13 +10,25 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient();
-builder.Services.AddRateLimiter(options => options.AddFixedWindowLimiter("assistant", limiter =>
+builder.Services.AddHttpClient<OpenBankingService>();
+builder.Services.AddSingleton<MarketDataService>();
+builder.Services.AddRateLimiter(options =>
 {
-    limiter.PermitLimit = 12;
-    limiter.Window = TimeSpan.FromMinutes(1);
-    limiter.QueueLimit = 0;
-    limiter.AutoReplenishment = true;
-}));
+    options.AddFixedWindowLimiter("assistant", limiter =>
+    {
+        limiter.PermitLimit = 12;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+        limiter.AutoReplenishment = true;
+    });
+    options.AddFixedWindowLimiter("market-quotes", limiter =>
+    {
+        limiter.PermitLimit = 5;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+        limiter.AutoReplenishment = true;
+    });
+});
 
 builder.Services.AddDbContext<BankDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=studentbank.db"));
@@ -227,6 +239,201 @@ app.MapPost("/api/assistant/chat", async Task<IResult> (
     }
 }).RequireRateLimiting("assistant");
 
+var openBankingApi = app.MapGroup("/api/open-banking").RequireAuthorization();
+openBankingApi.MapGet("/connect", (OpenBankingService service, ClaimsPrincipal user) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrWhiteSpace(userId)) return Results.Unauthorized();
+    try
+    {
+        var start = service.CreateAuthorizationUrl(userId);
+        return Results.Ok(start);
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+});
+openBankingApi.MapPost("/exchange", async (OpenBankingExchangeRequest request, OpenBankingService service, ClaimsPrincipal user, CancellationToken cancellationToken) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrWhiteSpace(userId)) return Results.Unauthorized();
+    if (string.IsNullOrWhiteSpace(request.State) || string.IsNullOrWhiteSpace(request.Code))
+        return Results.BadRequest(new { message = "Copy both the authorization code and state returned by the bank provider." });
+    try
+    {
+        await service.ExchangeCodeAsync(userId, request.State, request.Code, cancellationToken);
+        return Results.Ok(new { message = "Sandbox bank connection established for this server session." });
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.BadRequest(new { message = exception.Message });
+    }
+});
+openBankingApi.MapGet("/accounts", async (OpenBankingService service, ClaimsPrincipal user, CancellationToken cancellationToken) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrWhiteSpace(userId)) return Results.Unauthorized();
+    try
+    {
+        return Results.Ok(await service.GetAccountsAsync(userId, cancellationToken));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status400BadRequest);
+    }
+    catch (HttpRequestException)
+    {
+        return Results.Problem("The external bank sandbox is unavailable. Try again later.", statusCode: StatusCodes.Status502BadGateway);
+    }
+});
+openBankingApi.MapDelete("/connection", (OpenBankingService service, ClaimsPrincipal user) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrWhiteSpace(userId)) return Results.Unauthorized();
+    service.Disconnect(userId);
+    return Results.Ok(new { message = "The in-memory sandbox connection was removed." });
+});
+
+var marketApi = app.MapGroup("/api/market").RequireAuthorization();
+marketApi.MapGet("/quote/{symbol}", async (string symbol, MarketDataService service, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        return Results.Ok(await service.GetQuoteAsync(symbol, cancellationToken));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+    catch (HttpRequestException)
+    {
+        return Results.Problem("The market data provider could not be reached. Try again later.", statusCode: StatusCodes.Status502BadGateway);
+    }
+}).RequireRateLimiting("market-quotes");
+
+var assistantApi = app.MapGroup("/api/assistant").RequireAuthorization();
+assistantApi.MapPost("/spending-insights", async Task<IResult> (
+    SpendingInsightsRequest request,
+    OpenBankingService openBankingService,
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    ILogger<Program> logger,
+    ClaimsPrincipal user,
+    CancellationToken cancellationToken) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrWhiteSpace(userId)) return Results.Unauthorized();
+    if (!request.ConsentToShareTransactions)
+        return Results.BadRequest(new { message = "Review and accept the transaction-data notice before requesting AI spending insights." });
+    var question = request.Message?.Trim();
+    if (string.IsNullOrWhiteSpace(question) || question.Length > 1000)
+        return Results.BadRequest(new { message = "Write a question of up to 1,000 characters." });
+    var apiKey = configuration["OpenAI:ApiKey"] ?? configuration["OPENAI_API_KEY"];
+    if (string.IsNullOrWhiteSpace(apiKey))
+        return Results.Problem("Set OPENAI_API_KEY on the StudentBank server to enable AI replies.", statusCode: StatusCodes.Status503ServiceUnavailable);
+
+    try
+    {
+        var accounts = await openBankingService.GetAccountsAsync(userId, cancellationToken);
+        var categories = accounts.SelectMany(account => account.Transactions)
+            .Where(transaction => transaction.Amount < 0m)
+            .GroupBy(transaction => new { transaction.Currency, transaction.Category })
+            .Select(group => new { group.Key.Currency, category = group.Key.Category, transactions = group.Count(), total = Math.Abs(group.Sum(item => item.Amount)) })
+            .OrderByDescending(group => group.total)
+            .ToArray();
+        if (categories.Length == 0)
+            return Results.Ok(new { reply = "I could not find recent outgoing transactions in the connected sandbox accounts." });
+
+        var payload = new
+        {
+            model = configuration["OpenAI:Model"] ?? "gpt-4.1-mini",
+            instructions = "You are an educational student budgeting assistant. The user explicitly chose to share their 30-day category totals for this request. Explain only descriptive patterns in the supplied aggregated transaction categories. Do not identify individual purchases, infer sensitive traits, recommend financial products, or give investment, debt, or personalized financial advice. Do not claim to make payments or access any data beyond the aggregates shown. Mention that provider categories may be approximate and this is not financial advice.",
+            input = $"Question: {question}\n30-day outgoing transaction aggregates by currency and category (no merchant names or account identifiers): {System.Text.Json.JsonSerializer.Serialize(categories)}",
+            max_output_tokens = 350
+        };
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/responses");
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+        httpRequest.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+        using var response = await httpClientFactory.CreateClient().SendAsync(httpRequest, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogWarning("AI spending insight provider returned HTTP {StatusCode}.", (int)response.StatusCode);
+            return Results.Problem("The assistant could not create an insight right now. Try again later.", statusCode: StatusCodes.Status502BadGateway);
+        }
+        using var document = await System.Text.Json.JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
+        var reply = document.RootElement.GetProperty("output").EnumerateArray()
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "message")
+            .SelectMany(item => item.GetProperty("content").EnumerateArray())
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "output_text")
+            .Select(item => item.GetProperty("text").GetString())
+            .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
+        return string.IsNullOrWhiteSpace(reply)
+            ? Results.Problem("The assistant returned an empty reply.", statusCode: StatusCodes.Status502BadGateway)
+            : Results.Ok(new { reply });
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.BadRequest(new { message = exception.Message });
+    }
+    catch (HttpRequestException)
+    {
+        return Results.Problem("Could not load the connected bank data or reach the AI provider.", statusCode: StatusCodes.Status502BadGateway);
+    }
+}).RequireRateLimiting("assistant");
+
+assistantApi.MapPost("/market-explanation", async Task<IResult> (
+    MarketExplanationRequest request,
+    MarketDataService marketDataService,
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+{
+    var question = request.Message?.Trim();
+    if (string.IsNullOrWhiteSpace(question) || question.Length > 500)
+        return Results.BadRequest(new { message = "Write a short question about the displayed quote." });
+    var apiKey = configuration["OpenAI:ApiKey"] ?? configuration["OPENAI_API_KEY"];
+    if (string.IsNullOrWhiteSpace(apiKey))
+        return Results.Problem("Set OPENAI_API_KEY on the StudentBank server to enable AI replies.", statusCode: StatusCodes.Status503ServiceUnavailable);
+    try
+    {
+        var quote = await marketDataService.GetQuoteAsync(request.Symbol, cancellationToken);
+        var payload = new
+        {
+            model = configuration["OpenAI:Model"] ?? "gpt-4.1-mini",
+            instructions = "Explain public market quote fields in plain educational language. Do not recommend buying, selling, or holding securities, predict returns, or give personalized investment advice. Explain that a quoted price can be delayed, may not be executable, and can change. Use only the quote supplied.",
+            input = $"Question: {question}\nMarket quote: symbol {quote.Symbol}; price {quote.Price}; change {quote.Change} ({quote.ChangePercent}); trading day {quote.TradingDay}. Provider notice: {quote.DataNotice}",
+            max_output_tokens = 250
+        };
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/responses");
+        httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+        httpRequest.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+        using var response = await httpClientFactory.CreateClient().SendAsync(httpRequest, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogWarning("AI market explanation provider returned HTTP {StatusCode}.", (int)response.StatusCode);
+            return Results.Problem("The assistant could not explain this quote right now.", statusCode: StatusCodes.Status502BadGateway);
+        }
+        using var document = await System.Text.Json.JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
+        var reply = document.RootElement.GetProperty("output").EnumerateArray()
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "message")
+            .SelectMany(item => item.GetProperty("content").EnumerateArray())
+            .Where(item => item.TryGetProperty("type", out var type) && type.GetString() == "output_text")
+            .Select(item => item.GetProperty("text").GetString())
+            .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
+        return string.IsNullOrWhiteSpace(reply) ? Results.Problem("The assistant returned an empty reply.", statusCode: StatusCodes.Status502BadGateway) : Results.Ok(new { reply });
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+    catch (HttpRequestException)
+    {
+        return Results.Problem("The quote or assistant provider could not be reached.", statusCode: StatusCodes.Status502BadGateway);
+    }
+}).RequireRateLimiting("assistant");
+
 var authApi = app.MapGroup("/api/auth");
 authApi.MapPost("/register", async (RegisterRequest request, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) =>
 {
@@ -324,7 +531,9 @@ protectedApi.MapGet("/accounts", async (BankingService bankingService, ClaimsPri
         return Results.Unauthorized();
     }
 
-    return Results.Ok(await bankingService.GetAccountsForUserAsync(userId));
+    var accounts = await bankingService.GetAccountsForUserAsync(userId);
+    return Results.Ok(accounts.Select(account => new AccountSummaryDto(
+        account.AccountNumber, account.HolderName, account.Balance, account.Currency, account.IsActive, account.CreatedAt)));
 });
 
 protectedApi.MapPost("/accounts", async (CreateAccountRequest request, BankingService bankingService, ClaimsPrincipal user) =>
@@ -722,7 +931,7 @@ public sealed class BankingService
 
         var toAccount = await _dbContext.BankAccounts
             .Include(account => account.Transactions)
-            .FirstOrDefaultAsync(account => account.IsActive && account.AccountNumber == toAccountNumber);
+            .FirstOrDefaultAsync(account => account.UserId == userId && account.IsActive && account.AccountNumber == toAccountNumber);
 
         if (toAccount is null)
         {
@@ -988,6 +1197,41 @@ public sealed class TransferResult
 
     [JsonPropertyName("timestamp")]
     public DateTime Timestamp { get; set; }
+}
+
+public sealed record AccountSummaryDto(
+    string AccountNumber,
+    string HolderName,
+    decimal Balance,
+    string Currency,
+    bool IsActive,
+    DateTime CreatedAt);
+
+public sealed class OpenBankingExchangeRequest
+{
+    [JsonPropertyName("state")]
+    public string State { get; set; } = string.Empty;
+
+    [JsonPropertyName("code")]
+    public string Code { get; set; } = string.Empty;
+}
+
+public sealed class SpendingInsightsRequest
+{
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+
+    [JsonPropertyName("consentToShareTransactions")]
+    public bool ConsentToShareTransactions { get; set; }
+}
+
+public sealed class MarketExplanationRequest
+{
+    [JsonPropertyName("symbol")]
+    public string Symbol { get; set; } = string.Empty;
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
 }
 
 public sealed class AssistantChatRequest

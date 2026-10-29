@@ -8,16 +8,17 @@
     <Grid RowDefinitions="*">
         <ScrollView>
             <VerticalStackLayout Padding="22,18,22,28" Spacing="22">
-                <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                <Grid ColumnDefinitions="*,Auto,Auto" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="2">
                         <Label Text="Good morning," FontSize="14" TextColor="#64736E" />
-                        <Label Text="Bishant" FontSize="25" FontAttributes="Bold" TextColor="#123B32" />
+                        <Label x:Name="GreetingName" Text="Student" FontSize="25" FontAttributes="Bold" TextColor="#123B32" />
                     </VerticalStackLayout>
                     <Border Grid.Column="1" WidthRequest="48" HeightRequest="48" BackgroundColor="#E1F1EB"
                             StrokeThickness="0" StrokeShape="RoundRectangle 24" VerticalOptions="Center">
                         <Label Text="B" FontSize="20" FontAttributes="Bold" TextColor="#08765B"
                                HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
+                    <Button Grid.Column="2" Text="Sign out" Clicked="OnSignOutClicked" BackgroundColor="Transparent" TextColor="#08765B" FontSize="12" Padding="8,4" />
                 </Grid>
 
                 <Border Padding="22" BackgroundColor="#08765B" StrokeThickness="0" StrokeShape="RoundRectangle 24">
@@ -28,19 +29,19 @@
                                     BackgroundColor="Transparent" TextColor="White" Padding="6,0"
                                     MinimumHeightRequest="36" MinimumWidthRequest="48" />
                         </Grid>
-                        <Label x:Name="BalanceLabel" Text="£2,450.75" FontSize="35" FontAttributes="Bold" TextColor="White" />
-                        <Label Text="Sample balance · Demo account" FontSize="13" TextColor="#D1EFE4" />
+                        <Label x:Name="BalanceLabel" Text="—" FontSize="35" FontAttributes="Bold" TextColor="White" />
+                        <Label x:Name="BalanceCaption" Text="StudentBank demo ledger · refreshes from server" FontSize="13" TextColor="#D1EFE4" />
                         <Grid ColumnDefinitions="*,*" Margin="0,10,0,0" ColumnSpacing="12">
                             <Border Padding="12" BackgroundColor="#21866E" StrokeThickness="0" StrokeShape="RoundRectangle 14">
                                 <VerticalStackLayout Spacing="3">
-                                    <Label Text="Everyday account" FontSize="12" TextColor="#D1EFE4" />
-                                    <Label Text="•• 4821" FontSize="15" FontAttributes="Bold" TextColor="White" />
+                                    <Label x:Name="AccountOneName" Text="No account yet" FontSize="12" TextColor="#D1EFE4" />
+                                    <Label x:Name="AccountOneNumber" Text="Create one in Accounts" FontSize="15" FontAttributes="Bold" TextColor="White" />
                                 </VerticalStackLayout>
                             </Border>
                             <Border Grid.Column="1" Padding="12" BackgroundColor="#21866E" StrokeThickness="0" StrokeShape="RoundRectangle 14">
                                 <VerticalStackLayout Spacing="3">
-                                    <Label Text="Student saver" FontSize="12" TextColor="#D1EFE4" />
-                                    <Label Text="•• 1904" FontSize="15" FontAttributes="Bold" TextColor="White" />
+                                    <Label x:Name="AccountTwoName" Text="More demo accounts" FontSize="12" TextColor="#D1EFE4" />
+                                    <Label x:Name="AccountTwoNumber" Text="—" FontSize="15" FontAttributes="Bold" TextColor="White" />
                                 </VerticalStackLayout>
                             </Border>
                         </Grid>
