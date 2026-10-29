@@ -86,9 +86,35 @@ Use accessibility checks alongside the task: text scaling, contrast, screen-read
 
 ### Research and usability evidence log
 
-| Date / anonymous participant | Task | Completion and errors | Time / steps | Quote or observed hesitation | Design change to try |
+Use the guide below with three student participants. Ask for permission to take notes, avoid collecting account or other sensitive personal information, and label notes P1, P2, and P3. The friends suggested for these sessions are not named in this public project document. Replace the blank fields only with what each person actually says or does.
+
+#### Short interview and prototype session
+
+**Opening:** “I’m working on a student banking app prototype. I’d like to learn how you understand the screens, not test you. There are no right answers. You can skip a question or stop at any time. May I take anonymous notes?”
+
+Ask these questions before showing the app:
+
+1. What do you usually want to check first when you open a banking app?
+2. Tell me about the last time it was hard to understand a balance or transaction.
+3. When you check money on your phone, where are you and what are you doing?
+4. What would you expect a banking assistant to know about your account? What should it never do?
+
+Then give the participant the phone and ask them to:
+
+1. Find a balance and tell you its currency and whether they think it is sample or live data.
+2. Find a recent transaction and explain what they think it means.
+3. Ask the assistant a general budgeting question, then say what information they think it can access.
+4. Return to Home and find the Accounts screen.
+
+While they work, stay quiet. Record what they do, where they pause, any errors, and their words as accurately as possible. Afterward ask: “What was clear?”, “What was confusing?”, and “If you could change one thing, what would you change?” Do not suggest answers during the task.
+
+| Participant code | Date | What they said about their needs (short notes or exact brief quotes) | Task result / hesitation observed | Change they suggested | Permission to use anonymous notes? |
 | --- | --- | --- | --- | --- | --- |
-| Not collected yet |  |  |  |  |  |
+| P1 |  |  |  |  |  |
+| P2 |  |  |  |  |  |
+| P3 |  |  |  |  |  |
+
+The sessions have not been conducted yet. Do not describe the proposed questions or likely answers as participant feedback.
 
 ### Peer critique log
 
