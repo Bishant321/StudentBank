@@ -21,6 +21,18 @@ This map connects the course materials shared for this project with the current 
 | Persona worksheet | Persona, user needs, goals, frustrations, and context of use | `Worksheet_filled (1).pdf` is a blank one-page persona template. | Put its content under user research and requirements, and link the eventual persona to the proposal's target audience. The exact week is not shown on the worksheet, so do not label it as a specific week without the class schedule. Fill it from actual student input or label it as a hypothesis. |
 | Week 6 | Proposal, critique, usability, feasibility, scope, pitch, and a phased plan to Week 12 | [`WEEK_6_PROPOSAL_CRITIQUE_PITCH.md`](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md) contains the proposal, architecture diagram, draft MoSCoW list, risk register, interview guide, anonymous response forms, plan, and pitch outline. | The planning material belongs here. User interviews, participant task observations, peer critique, and the authenticated mobile account-read spike remain outstanding. The desk review is explicitly not student feedback. |
 
+## Feedback on the current prototype
+
+This is a desk review of the app files and screens, not feedback collected from classmates or friends. It can support the Week 6 critique preparation, but must not be reported as participant research.
+
+| Critique prompt | Feedback | Lens / reason | Suggested action |
+| --- | --- | --- | --- |
+| I like | The Home screen puts the total balance and recent activity up front. The app labels balances as demo data, and the Assistant screen explains that it cannot access accounts or move money. | Nielsen: clear status and recognition; Norman: the interface explains the assistant boundary. | Keep these explanations visible and check with students whether they understand them. |
+| I wish | The Accounts screen says “Updated just now,” although its values are static examples. Send, Add, and Cards look like banking actions before the demo warning appears. | Norman: signifiers and feedback should match what the system actually does. | Remove or qualify the freshness text; label the quick actions as previews or make their demo status visible before tapping. |
+| What if | The app focused its first release on one clear task: understand sample account balances and recent activity, then made live account reading a separate, tested milestone? | Agile/MoSCoW: protect the core task and defer higher-risk work until it is feasible. | Validate the core task with students, then run the authenticated read-only API spike before expanding scope. |
+
+These recommendations are recorded in more detail in the [Week 6 desk review](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md#desk-review-answers-and-design-notes-not-student-feedback). The peer critique table and participant response forms remain blank until real sessions happen.
+
 ## Week-by-week record available so far
 
 ```text
