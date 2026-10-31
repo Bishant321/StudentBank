@@ -39,22 +39,25 @@ These stories are hypotheses until discussed with students. A useful acceptance 
 
 ## Current prototype and architecture
 
-The repository contains an ASP.NET Core web banking demo and a .NET MAUI mobile prototype. They are not currently one connected banking product: the mobile app displays fictional local sample balances and activity, while the web app has its own authenticated SQLite banking flows. The mobile assistant sends the typed question to the server endpoint; it does not attach account data. Keep this boundary explicit in any pitch or demo.
+The repository contains an ASP.NET Core banking coursework backend and a .NET MAUI mobile prototype. The mobile app now signs in to the backend and reads the signed-in user's demo ledger; internal transfers update only fictional balances in the local SQLite database. External account reading is a TrueLayer sandbox flow. Keep those demo and sandbox boundaries explicit in any pitch or demo.
 
 ```mermaid
 flowchart LR
     User[Student] --> UI[MAUI XAML pages]
     UI --> State[Page code and view state]
-    State --> Sample[Local fictional sample balances]
-    State --> AssistantClient[Assistant HttpClient]
-    AssistantClient --> Endpoint[ASP.NET /api/assistant/chat]
-    Endpoint --> Model[OpenAI Responses API]
+    State --> BankingClient[Authenticated BankingApiClient]
+    BankingClient --> Endpoint[ASP.NET account and demo transfer endpoints]
+    Endpoint --> SQLite[(SQLite demo ledger)]
+    State --> BankLink[TrueLayer sandbox read-only connection]
+    State --> AssistantClient[Assistant and market API calls]
+    AssistantClient --> EndpointAI[ASP.NET assistant endpoints]
+    EndpointAI --> Model[OpenAI Responses API]
     WebUser[Web user] --> WebUI[Web dashboard]
     WebUI --> WebAPI[ASP.NET banking API]
     WebAPI --> SQLite[(SQLite database)]
 ```
 
-The current mobile app has Home, Accounts, and Assistant tabs, plus retained Week 3 task pages and the Week 4 Pokémon API exercise. The backend has authenticated account and transaction endpoints. The mobile banking screens are not yet wired to those endpoints. See [mobile development notes](../MyApp/DEVELOPMENT_NOTES.md) and [design-thinking worksheet](DESIGN_THINKING_WORKSHEET.md) for implementation details.
+The current mobile app has Home, Accounts, Assistant, and Markets tabs, a sign-in page and transfer route, plus retained Week 3 task pages and the Week 4 Pokémon API exercise. The backend has authenticated account, statement, and demo transfer endpoints. The mobile app also has optional, consent-gated transaction-category insights. TrueLayer access is sandbox-only; market quotes are informational and no trades are placed. See [mobile development notes](../MyApp/DEVELOPMENT_NOTES.md) and [design-thinking worksheet](DESIGN_THINKING_WORKSHEET.md) for implementation details.
 
 ## Prioritized scope (draft)
 
@@ -64,7 +67,7 @@ The current mobile app has Home, Accounts, and Assistant tabs, plus retained Wee
 | Must | Show recent sample activity and clear loading, empty, and error states where a request occurs | Users need feedback and should not have to guess whether something worked |
 | Must | Assistant explains general budgeting and banking concepts, with an explicit privacy boundary | Keep it educational; do not send account details or perform financial actions |
 | Must | Three-tab navigation and accessible labels, scalable text, and large touch targets | Supports predictable use on a phone |
-| Should | Connect mobile account views to the authenticated StudentBank API | Removes the current split between the mobile sample data and web banking data; requires a secure, tested client flow |
+| Done in prototype; verify | Connect mobile demo-ledger views and internal demo transfers to the authenticated StudentBank API | Implemented for the coursework backend; complete emulator walkthrough and error-state review |
 | Should | Provide a visible refresh or last-updated state and a useful offline message | Makes data freshness and connectivity understandable |
 | Could | Cache account and activity reads for limited offline viewing | Only after defining freshness and sign-out behavior |
 | Could | Add a simple spending summary based on clearly explained data | Requires validated user value and careful handling of financial data |
@@ -169,7 +172,7 @@ Each phase should end with a runnable build. Adjust dates and estimates with the
 
 | Phase | Weeks | Deliverable | Done when… |
 | --- | --- | --- | --- |
-| 0. Walking skeleton | Week 6 | Existing MAUI shell, API project, and local prototype documented; run the authenticated read-only API spike | App runs on emulator and the spike answers whether mobile account reads are feasible |
+| 0. Walking skeleton | Week 6 | Existing MAUI shell, API project, and local prototype documented; implement and verify authenticated demo-ledger reads | App runs on emulator and signed-in account reads are demonstrated |
 | 1. Core MVP | Week 7 | Refined Home and Accounts screens, sample/live state labelled, essential navigation and feedback | A student can complete the primary account-understanding task in a short usability session |
 | 2. Intelligent feature | Week 8 | Educational assistant with visible limits and server-side configuration | Assistant handles expected questions and failure cases without receiving account details |
 | 3. Test and refine | Weeks 9–10 | Usability findings, defect list, accessibility refinements, updated critique log | Priority defects are fixed and at least one design change is checked with users |
@@ -184,13 +187,13 @@ Use approximately five slides with readable text and show the screens. Replace t
 1. **0:00–0:20 — One liner:** “StudentBank helps students understand their money by presenting account balances and activity clearly, with an assistant for general budgeting questions.”
 2. **0:20–0:50 — User and problem:** identify the student audience and phone context; say that the need is a hypothesis until interviews are completed.
 3. **0:50–1:40 — Core task:** demonstrate Home, Accounts, and the Assistant boundary; point out sample-data labels.
-4. **1:40–2:20 — Feasibility:** show the MAUI-to-server assistant flow and separate web banking API/SQLite flow; name the authenticated mobile account-read spike as the main open risk.
+4. **1:40–2:20 — Feasibility:** show the MAUI-to-ASP.NET authenticated demo-account flow and SQLite ledger; explain that TrueLayer is sandbox-only and live banking access would need a regulated provider arrangement.
 5. **2:20–2:50 — Scope and plan:** show Must/Should/Won't and Weeks 6–12 phases.
 6. **2:50–3:00 — Ask:** request critique on whether the account summary is clear and whether connecting mobile views to the authenticated API should outrank other features.
 
 ## Next actions
 
 1. Interview a few students and replace the proposed needs with what they actually say and do.
-2. Run the account-read feasibility spike and record the result in development notes.
+2. Complete and record a successful Android emulator walkthrough of sign-in, account read, and demo transfer; keep any observed failures in the technical risk list.
 3. Present the prototype, capture peer critique, and fill the feedback log with accept/adapt/reject decisions.
 4. Refine the Must/Should/Could/Won't scope and Week 6–12 estimates using that evidence.

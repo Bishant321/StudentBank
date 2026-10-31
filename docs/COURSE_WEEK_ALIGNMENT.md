@@ -7,6 +7,7 @@ This map connects the course materials shared for this project with the current 
 - `week1.pdf` — cover identifies it as the Week 1 module launch.
 - `chapter_4.pdf` — cover identifies client-server architecture.
 - `Week 4 (1).pdf` — cover identifies it as Week 4.
+- `chapter_5_supplementary.pdf` — Week 5 supplementary lecture slides on relational databases, NoSQL, and data management/synchronization.
 - `FGCT6021 Proposal, Critique & Pitch-3.pptx.pdf` — Week 6 proposal, critique, and pitch materials.
 - `Worksheet_filled (1).pdf` — one-page Persona Template; the entry fields appear blank. It says to use the persona for the idea pitched the previous week, but does not identify a week number on the page.
 - Week 3 requirements shared in the conversation — MAUI pages, Shell navigation, layouts, styles, and the sample project activity.
@@ -17,9 +18,10 @@ This map connects the course materials shared for this project with the current 
 | --- | --- | --- | --- |
 | Week 1 | Module launch and app idea | The chosen coursework concept is a StudentBank mobile banking prototype with an educational assistant. The repository also contains the web banking prototype. | The project has a clear direction. Keep the problem and target audience provisional until students have been interviewed; the project idea alone is not research evidence. |
 | Week 3 | MAUI app shell, layouts, pages, navigation, shared styles, and sample-project exploration | `MyApp/` contains Home, Accounts, Assistant, task pages, Shell routes, shared styles, and the Pokémon workshop page. The app has been shown running in an Android emulator. | This is the right home for Shell, XAML layout, and route notes in [`MyApp/DEVELOPMENT_NOTES.md`](../MyApp/DEVELOPMENT_NOTES.md). The actual workshop checklist is recorded there. |
-| Week 4 | Client-server architecture and APIs | The MAUI Pokémon page uses a typed `HttpClient` service for PokéAPI. The Assistant page sends a question to the ASP.NET `/api/assistant/chat` endpoint. The web banking API uses SQLite. | API and server examples belong with the Week 4 notes. Important gap: mobile Home and Accounts still show local fictional values and are not connected to authenticated bank-account endpoints. |
+| Week 4 | Client-server architecture and APIs | The MAUI Pokémon page uses a typed `HttpClient` service for PokéAPI. The banking client also calls authenticated ASP.NET endpoints for StudentBank demo accounts and transfers. The backend uses SQLite. | This demonstrates client/server calls, JSON models, authenticated requests, and error handling. The Android app build and end-to-end emulator flow still need a successful run. |
+| Week 5 | Supplementary lecture: relational data, DBMS/schema/SQL, local vs cloud, synchronization, and NoSQL models | The backend stores users, bank accounts, and transactions in SQLite via Entity Framework Core. MAUI workshop tasks are stored locally as JSON. Provider and AI APIs also exchange JSON. | The relational database is the right fit for structured accounts and balance-changing demo transactions. JSON files and API JSON are data formats, not NoSQL databases. The project has no cloud database replication or synchronization feature; its backend uses a local SQLite file. NoSQL is material to compare, not a requirement to add another database. See the Week 5 notes in [`MyApp/DEVELOPMENT_NOTES.md`](../MyApp/DEVELOPMENT_NOTES.md). |
 | Persona worksheet | Persona, user needs, goals, frustrations, and context of use | `Worksheet_filled (1).pdf` is a blank one-page persona template. | Put its content under user research and requirements, and link the eventual persona to the proposal's target audience. The exact week is not shown on the worksheet, so do not label it as a specific week without the class schedule. Fill it from actual student input or label it as a hypothesis. |
-| Week 6 | Proposal, critique, usability, feasibility, scope, pitch, and a phased plan to Week 12 | [`WEEK_6_PROPOSAL_CRITIQUE_PITCH.md`](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md) contains the proposal, architecture diagram, draft MoSCoW list, risk register, interview guide, anonymous response forms, plan, and pitch outline. | The planning material belongs here. User interviews, participant task observations, peer critique, and the authenticated mobile account-read spike remain outstanding. The desk review is explicitly not student feedback. |
+| Week 6 | Proposal, critique, usability, feasibility, scope, pitch, and a phased plan to Week 12 | [`WEEK_6_PROPOSAL_CRITIQUE_PITCH.md`](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md) contains the proposal, architecture diagram, draft MoSCoW list, risk register, interview guide, anonymous response forms, plan, and pitch outline. | The proposal began before the mobile-to-backend account connection was implemented. The authenticated demo-account read and transfer flow now exist, but Android end-to-end verification remains open. User interviews, participant task observations, and peer critique also remain outstanding; the desk review is not student feedback. |
 
 ## Feedback on the current prototype
 
@@ -28,8 +30,8 @@ This is a desk review of the app files and screens, not feedback collected from 
 | Critique prompt | Feedback | Lens / reason | Suggested action |
 | --- | --- | --- | --- |
 | I like | The Home screen puts the total balance and recent activity up front. The app labels balances as demo data, and the Assistant screen explains that it cannot access accounts or move money. | Nielsen: clear status and recognition; Norman: the interface explains the assistant boundary. | Keep these explanations visible and check with students whether they understand them. |
-| I wish | The Accounts screen says “Updated just now,” although its values are static examples. Send, Add, and Cards look like banking actions before the demo warning appears. | Norman: signifiers and feedback should match what the system actually does. | Remove or qualify the freshness text; label the quick actions as previews or make their demo status visible before tapping. |
-| What if | The app focused its first release on one clear task: understand sample account balances and recent activity, then made live account reading a separate, tested milestone? | Agile/MoSCoW: protect the core task and defer higher-risk work until it is feasible. | Validate the core task with students, then run the authenticated read-only API spike before expanding scope. |
+| I wish | The account and transfer screens made the demo boundary visible at the point of action, and the app showed a clear recovery path when the backend or sandbox provider is unavailable. | Norman: signifiers and feedback should match what the system actually does. | Keep demo-transfer labels visible, test loading/error states on the emulator, and verify that provider failures explain how to reconnect. |
+| What if | The app introduced the connected-account screen as optional sandbox exploration after students understand the core demo ledger? | Agile/MoSCoW: protect the core task and defer higher-risk work until it is feasible. | Validate the account-understanding task with students before expanding the project toward real provider access. |
 
 These recommendations are recorded in more detail in the [Week 6 desk review](WEEK_6_PROPOSAL_CRITIQUE_PITCH.md#desk-review-answers-and-design-notes-not-student-feedback). The peer critique table and participant response forms remain blank until real sessions happen.
 
@@ -40,7 +42,7 @@ Week 1  App direction: StudentBank mobile banking prototype with a learning assi
 Week 2  No week-specific material provided for this review
 Week 3  MAUI Shell, layouts, routes, styles, and sample project — in MyApp notes
 Week 4  Client-server architecture and API practice — in MyApp notes
-Week 5  No week-specific slide or brief provided for this review
+Week 5  Relational databases, NoSQL, and synchronization — in MyApp development notes
 Week 6  Proposal, critique, scope, risks, pitch, and phased plan — in Week 6 proposal notes
 Week 7+ No week-specific slide or brief provided for this review
 ```
@@ -50,7 +52,7 @@ Week 7+ No week-specific slide or brief provided for this review
 ## Next actions in course order
 
 1. Confirm the Week 1 app idea and target user using the module brief and actual student conversations.
-2. Keep the Week 3 and Week 4 code explanations in the mobile development notes as the implementation portfolio.
+2. Keep the Week 3, Week 4, and Week 5 code explanations in the mobile development notes as the implementation portfolio.
 3. Complete the persona worksheet with anonymized, real observations; until then, call it a draft hypothesis.
-4. Gather the Week 6 interview and critique evidence, run the account-read feasibility spike, and revise the scope and plan from those results.
+4. Gather the Week 6 interview and critique evidence, finish the Android end-to-end check, and revise the scope and plan from those results.
 5. Add future week materials to this map only when they are provided, then record the corresponding implementation and evidence in the relevant project notes.
