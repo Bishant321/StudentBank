@@ -25,6 +25,8 @@ public partial class MainPage : ContentPage
         try
         {
             var accounts = await bankingApi.GetAccountsAsync();
+            var showingSavedData = bankingApi.LastLedgerReadWasOffline;
+            var savedAt = bankingApi.LastOfflineLedgerSave;
             if (accounts.Count == 0)
             {
                 BalanceLabel.Text = "No accounts";
@@ -32,13 +34,20 @@ public partial class MainPage : ContentPage
                 AccountOneNumber.Text = "Open Accounts";
                 AccountTwoNumber.Text = "—";
                 Transactions.Clear();
+                SetLedgerStatus(showingSavedData, savedAt);
                 return;
             }
 
             var mainAccount = accounts[0];
             GreetingName.Text = string.IsNullOrWhiteSpace(bankingApi.CurrentUserName) ? mainAccount.HolderName : bankingApi.CurrentUserName;
-            BalanceLabel.Text = $"{mainAccount.Currency} {mainAccount.Balance:N2}";
-            BalanceCaption.Text = "StudentBank demo ledger · not an external bank balance";
+            var currencyGroups = accounts.GroupBy(account => account.Currency, StringComparer.OrdinalIgnoreCase).ToList();
+            BalanceLabel.Text = currencyGroups.Count == 1
+                ? $"{currencyGroups[0].Key} {currencyGroups[0].Sum(account => account.Balance):N2}"
+                : "Multiple currencies";
+            BalanceLabel.FontSize = currencyGroups.Count == 1 ? 35 : 26;
+            BalanceCaption.Text = currencyGroups.Count == 1
+                ? "StudentBank demo ledger · not an external bank balance"
+                : "Demo balances remain in their original currencies";
             AccountOneName.Text = mainAccount.HolderName;
             AccountOneNumber.Text = $"•• {mainAccount.AccountNumber[^Math.Min(4, mainAccount.AccountNumber.Length)..]}";
             var additional = accounts.Count - 1;
@@ -48,6 +57,9 @@ public partial class MainPage : ContentPage
             foreach (var account in accounts)
             {
                 var statement = await bankingApi.GetStatementAsync(account.AccountNumber);
+                showingSavedData |= bankingApi.LastLedgerReadWasOffline;
+                if (bankingApi.LastOfflineLedgerSave is { } statementSavedAt && (savedAt is null || statementSavedAt < savedAt))
+                    savedAt = statementSavedAt;
                 recent.AddRange(statement.Transactions.Select(transaction => (transaction.Timestamp, statement.Currency, transaction)));
             }
 
@@ -64,11 +76,21 @@ public partial class MainPage : ContentPage
                     $"{item.Timestamp:ddd, d MMM} · {item.Transaction.Type}",
                     $"{sign}{item.Currency} {item.Transaction.Amount:N2}", icon, color));
             }
+            SetLedgerStatus(showingSavedData, savedAt);
         }
         catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or TaskCanceledException)
         {
             BalanceCaption.Text = "Could not refresh the demo ledger. Open Accounts to retry.";
+            LedgerStatus.Text = "Ledger data is unavailable. Connect to the StudentBank server to refresh.";
+            LedgerStatus.IsVisible = true;
         }
+    }
+
+    private void SetLedgerStatus(bool showingSavedData, DateTimeOffset? savedAt)
+    {
+        LedgerStatus.IsVisible = showingSavedData;
+        if (showingSavedData)
+            LedgerStatus.Text = $"Offline · saved demo data from {savedAt?.ToLocalTime():dd MMM, HH:mm}. Transfers are unavailable.";
     }
 
     private void OnToggleBalanceClicked(object? sender, EventArgs e)
@@ -87,7 +109,10 @@ public partial class MainPage : ContentPage
         try
         {
             var accounts = await bankingApi.GetAccountsAsync();
-            BalanceLabel.Text = accounts.Count == 0 ? "No accounts" : $"{accounts[0].Currency} {accounts[0].Balance:N2}";
+            var groups = accounts.GroupBy(account => account.Currency, StringComparer.OrdinalIgnoreCase).ToList();
+            BalanceLabel.Text = accounts.Count == 0 ? "No accounts"
+                : groups.Count == 1 ? $"{groups[0].Key} {groups[0].Sum(account => account.Balance):N2}"
+                : "Multiple currencies";
         }
         catch
         {

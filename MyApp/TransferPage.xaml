@@ -14,7 +14,7 @@
             <Picker x:Name="ToPicker" Title="Choose destination account" ItemDisplayBinding="{Binding DisplayName}" />
             <Entry x:Name="AmountEntry" Placeholder="Amount" Keyboard="Numeric" />
             <Entry x:Name="DescriptionEntry" Placeholder="Reference (optional)" MaxLength="80" />
-            <Button Text="Review transfer" Clicked="OnReviewTransferClicked" Style="{StaticResource PrimaryButtonStyle}" HeightRequest="52" />
+            <Button x:Name="ReviewTransferButton" Text="Review transfer" Clicked="OnReviewTransferClicked" Style="{StaticResource PrimaryButtonStyle}" HeightRequest="52" />
             <Label x:Name="StatusLabel" FontSize="13" TextColor="#A33A32" IsVisible="False" />
         </VerticalStackLayout>
     </ScrollView>

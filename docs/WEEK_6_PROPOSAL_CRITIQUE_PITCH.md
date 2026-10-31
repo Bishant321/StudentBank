@@ -67,9 +67,8 @@ The current mobile app has Home, Accounts, Assistant, and Markets tabs, a sign-i
 | Must | Show recent sample activity and clear loading, empty, and error states where a request occurs | Users need feedback and should not have to guess whether something worked |
 | Must | Assistant explains general budgeting and banking concepts, with an explicit privacy boundary | Keep it educational; do not send account details or perform financial actions |
 | Must | Three-tab navigation and accessible labels, scalable text, and large touch targets | Supports predictable use on a phone |
-| Done in prototype; verify | Connect mobile demo-ledger views and internal demo transfers to the authenticated StudentBank API | Implemented for the coursework backend; complete emulator walkthrough and error-state review |
-| Should | Provide a visible refresh or last-updated state and a useful offline message | Makes data freshness and connectivity understandable |
-| Could | Cache account and activity reads for limited offline viewing | Only after defining freshness and sign-out behavior |
+| Implemented; verify on device | Connect mobile demo-ledger views and internal demo transfers to the authenticated StudentBank API | Implemented for the coursework backend; complete emulator walkthrough and error-state review |
+| Implemented; verify on device | Provide a visible offline status and read-only cached view of demo balances and statements | Cache uses MAUI SecureStorage per signed-in user; sign-out clears it; create, connect, and transfer actions are disabled while ledger reads are offline |
 | Could | Add a simple spending summary based on clearly explained data | Requires validated user value and careful handling of financial data |
 | Won't for this coursework phase | Real payments, production banking integration, investment advice, or AI actions on accounts | Outside safe, feasible prototype scope |
 | Won't for this coursework phase | Social features and elaborate personalization | Defer until core needs and time allow |
@@ -125,14 +124,14 @@ These notes answer the interview topics only from the app files and screens. The
 
 | Topic | What the current prototype shows | Analysis / next step |
 | --- | --- | --- |
-| What can a user check first? | Home puts a £2,450.75 total balance first, followed by quick actions and recent activity. Accounts lists two GBP demo balances, £1,820.75 and £630.00; they add up to the total. | The screen hierarchy is clear in the code. Ask participants whether total balance or separate accounts is more useful to them. |
-| Is the information sample or live? | Home says “Sample balance · Demo account”; Accounts says “A clear view of your sample balances” and explains the app is not connected to a bank. | Good prototype disclosure. However, Accounts also says “Updated just now” while the displayed value is static demo data. Remove that freshness claim or explain what it refers to. |
-| Can a user understand recent activity? | Home shows four sample transactions with merchant, category/date, and amount. | The balance card identifies the screen as a demo, but mark the activity itself as sample too. Test whether participants understand that amounts are fictional. |
-| What actions appear available? | Send, Add, and Cards buttons open a dialog explaining that no real money moves. | They look like real banking actions before the dialog appears. Consider labeling them as previews or replacing them with non-action examples until implemented; ask participants what they expect each button to do. |
+| What can a user check first? | Home loads the signed-in user's StudentBank demo-ledger accounts from the ASP.NET API. It adds balances only when they share a currency; with mixed currencies it says “Multiple currencies.” Recent activity is assembled from account statements. | This avoids treating different currencies as one total. Ask participants whether the account summary and currency labels are clear. |
+| Is the information sample or live? | Home labels the values as the StudentBank demo ledger and says they are not an external bank balance. Accounts labels its ledger as a coursework demo; the optional TrueLayer connection is explicitly a sandbox. | Keep these boundaries visible. The offline state identifies the save time and warns that changes are disabled. Check whether participants understand the different data sources. |
+| Can a user understand recent activity? | Home shows the latest four transactions returned by the signed-in user's StudentBank demo statements, with description, date/type, currency, and amount. | The activity is from the coursework ledger, not an external bank. Ask participants whether they can tell that from the screen and whether transaction labels are clear. |
+| What actions appear available? | Send opens an internal demo transfer page. Add and Cards show a coursework-demo notice and do not perform those actions. Transfers update only the StudentBank demo ledger; offline mode disables changes. | Keep the demo boundary in the transfer confirmation and evaluate whether users understand that no real money moves. |
 | What does the assistant claim and receive? | The Assistant screen says it cannot access accounts or move money and warns users not to share secrets. The server request contains the typed question and does not attach account balances or identifiers. | The boundary is stated clearly in the interface and code. Verify through a participant task whether the wording is understood; also test the unconfigured-server and connection-error states. |
 | Does the current code show real student context or usability? | No interviews, participant observations, task-completion results, or peer critique are present in the repository. | The app files cannot establish where students use banking apps, what they need first, or whether they find this prototype easy. Collect those answers directly and then update the blank P1–P3 forms. |
 
-**Design-review summary:** the prototype communicates that balances are examples and that the assistant is not account-aware. The clearest fix from inspecting the current screens is to remove the misleading “Updated just now” wording and label recent activity as sample. Treat these as code-review recommendations, not user-validated changes.
+**Design-review summary:** the prototype separates the StudentBank demo ledger from the TrueLayer sandbox, keeps the assistant's account-access boundary visible, and now provides a timestamped, read-only offline ledger cache. These observations come from source review, not user validation. Test whether people understand the labels and cached-data warning.
 
 ### Peer critique log
 
@@ -146,20 +145,21 @@ Record feedback using “I like / I wish / What if,” name the design lens, the
 
 ### Known evidence
 
-- The MAUI app has been shown running in an Android emulator, which supports the basic cross-platform UI and navigation feasibility.
-- The repository contains an ASP.NET API, SQLite-backed web banking operations, and a separate assistant endpoint.
+- The MAUI app has been shown running in an Android emulator, which supports the basic cross-platform UI and navigation feasibility. The latest authenticated screens and offline fallback still need a recorded end-to-end walkthrough.
+- The repository contains an ASP.NET API, SQLite-backed account and transfer operations, and separate assistant endpoints.
 - The mobile assistant service targets the local development backend. A public release would need a secured HTTPS backend and operational controls.
-- The mobile account screens currently use fictional sample data rather than the user's authenticated web account data.
+- Mobile account screens request the signed-in user's StudentBank coursework ledger; this is not the user's external bank account. TrueLayer uses sandbox data and is read-only here.
+- Account summaries and statements are cached in per-user MAUI SecureStorage for offline viewing. Writes and provider connection controls are disabled when the account read falls back to the cache. This behavior still needs device verification, including sign-out and reconnect cases.
 
 ### Riskiest assumption and spike
 
-**Assumption:** the MAUI app can securely read the signed-in user's account summary and recent activity from the existing ASP.NET API without exposing credentials or account data to the assistant.
+**Assumption tested in implementation:** the MAUI app can read the signed-in user's StudentBank demo account summary and recent activity from the existing ASP.NET API without sending account details to the general assistant.
 
-**Spike:** build one authenticated read-only request from the MAUI app to the existing account endpoint, render one account's currency and balance, handle sign-out and a failed connection, and verify that the assistant request still contains only the typed question. Timebox this before expanding the mobile feature set. The spike is not complete yet.
+**Spike status:** authenticated ledger and statement calls, account rendering, demo transfers, and a bounded offline cache are implemented. The assistant's general chat sends the typed question; transaction insights are separately consent-gated and aggregate categories/counts. Still verify the signed-in flow, failure handling, cache isolation, sign-out clearing, and assistant request boundaries on the Android emulator.
 
 | Risk | Likelihood | Impact | Early check / mitigation |
 | --- | --- | --- | --- |
-| Mobile app and web banking data remain disconnected | High | High | Spike one authenticated read-only account request before promising mobile live data |
+| Mobile authenticated ledger flow or offline behavior fails on device | Medium | High | Complete Android sign-in, read, offline fallback, reconnect, sign-out, and demo-transfer walkthrough; record issues and fix them |
 | API or AI service is unavailable, slow, or rate-limited | Medium | High | Show retry/error feedback; retain clearly labelled sample data for the demo; test timeout and no-key behavior |
 | Assistant output is mistaken for personal financial advice or account-aware guidance | Medium | High | State its limits in the UI and response instructions; test prompts about account access, transfers, fraud, and advice |
 | Sensitive account data or API credentials leak to the app or repository | Medium | High | Keep provider keys server-side; minimize mobile data; inspect logs and requests; never commit secrets |
@@ -172,8 +172,8 @@ Each phase should end with a runnable build. Adjust dates and estimates with the
 
 | Phase | Weeks | Deliverable | Done when… |
 | --- | --- | --- | --- |
-| 0. Walking skeleton | Week 6 | Existing MAUI shell, API project, and local prototype documented; implement and verify authenticated demo-ledger reads | App runs on emulator and signed-in account reads are demonstrated |
-| 1. Core MVP | Week 7 | Refined Home and Accounts screens, sample/live state labelled, essential navigation and feedback | A student can complete the primary account-understanding task in a short usability session |
+| 0. Walking skeleton | Week 6 | Existing MAUI shell, API project, and local prototype documented; authenticated demo-ledger reads and offline fallback implemented | App runs on emulator and signed-in, offline, and reconnect behavior are demonstrated |
+| 1. Core MVP | Week 7 | Refine Home and Accounts screens, data-source labels, essential navigation, and feedback from student research | A student can complete the primary account-understanding task in a short usability session |
 | 2. Intelligent feature | Week 8 | Educational assistant with visible limits and server-side configuration | Assistant handles expected questions and failure cases without receiving account details |
 | 3. Test and refine | Weeks 9–10 | Usability findings, defect list, accessibility refinements, updated critique log | Priority defects are fixed and at least one design change is checked with users |
 | 4. Release preparation | Weeks 11–12 | Stable build, setup and architecture notes, demonstration flow, submission evidence | A clean checkout can be built and the demo can be completed reliably |

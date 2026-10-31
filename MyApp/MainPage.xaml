@@ -31,6 +31,7 @@
                         </Grid>
                         <Label x:Name="BalanceLabel" Text="—" FontSize="35" FontAttributes="Bold" TextColor="White" />
                         <Label x:Name="BalanceCaption" Text="StudentBank demo ledger · refreshes from server" FontSize="13" TextColor="#D1EFE4" />
+                        <Label x:Name="LedgerStatus" IsVisible="False" FontSize="12" TextColor="#FFF2C6" />
                         <Grid ColumnDefinitions="*,*" Margin="0,10,0,0" ColumnSpacing="12">
                             <Border Padding="12" BackgroundColor="#21866E" StrokeThickness="0" StrokeShape="RoundRectangle 14">
                                 <VerticalStackLayout Spacing="3">

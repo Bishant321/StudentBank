@@ -15,6 +15,8 @@
                 <Button Grid.Column="1" Text="Refresh" Clicked="OnRefreshClicked" BackgroundColor="#E4F2EC" TextColor="#08765B" />
             </Grid>
 
+            <Label x:Name="LedgerStatus" IsVisible="False" TextColor="#8A5A00" FontSize="13" />
+
             <CollectionView x:Name="DemoAccountsView" ItemsSource="{Binding DemoAccounts}" SelectionMode="None" HeightRequest="180">
                 <CollectionView.EmptyView>
                     <Label Text="No StudentBank demo accounts yet. Create one below." TextColor="#64736E" />
@@ -40,7 +42,7 @@
                     <Picker x:Name="CurrencyPicker" Title="Currency">
                         <Picker.Items><x:String>GBP</x:String><x:String>USD</x:String><x:String>EUR</x:String></Picker.Items>
                     </Picker>
-                    <Button Text="Create empty account" Clicked="OnCreateAccountClicked" Style="{StaticResource PrimaryButtonStyle}" />
+                    <Button x:Name="CreateAccountButton" Text="Create empty account" Clicked="OnCreateAccountClicked" Style="{StaticResource PrimaryButtonStyle}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -48,9 +50,9 @@
                 <VerticalStackLayout Spacing="8">
                     <Label Text="External bank (TrueLayer sandbox)" FontSize="17" FontAttributes="Bold" TextColor="#164A3B" />
                     <Label Text="Connect through the provider's sandbox consent flow. Never enter your bank password in StudentBank. Sandbox data is not your real bank account." FontSize="13" TextColor="#587169" />
-                    <Button Text="Connect a test bank" Clicked="OnConnectBankClicked" BackgroundColor="#E4F2EC" TextColor="#08765B" />
+                    <Button x:Name="ConnectBankButton" Text="Connect a test bank" Clicked="OnConnectBankClicked" BackgroundColor="#E4F2EC" TextColor="#08765B" />
                     <Entry x:Name="AuthorizationCodeEntry" Placeholder="Paste the sandbox authorization code" />
-                    <Button Text="Finish sandbox connection" Clicked="OnFinishConnectClicked" Style="{StaticResource PrimaryButtonStyle}" />
+                    <Button x:Name="FinishConnectButton" Text="Finish sandbox connection" Clicked="OnFinishConnectClicked" Style="{StaticResource PrimaryButtonStyle}" />
                     <Label x:Name="ExternalBankStatus" FontSize="12" TextColor="#64736E" />
                 </VerticalStackLayout>
             </Border>

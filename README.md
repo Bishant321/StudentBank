@@ -19,11 +19,11 @@ A student banking coursework prototype built with ASP.NET Core, SQLite, cookie-b
 dotnet run --project WebApplication1
 ```
 
-Then open:
+The local HTTP profile listens on port `5080`. Then open:
 
-- Web app: http://localhost:5000/index.html
-- Swagger UI: http://localhost:5000/swagger
-- Health check: http://localhost:5000/api/health
+- Web app: http://localhost:5080/index.html
+- Swagger UI: http://localhost:5080/swagger (development environment only)
+- Health check: http://localhost:5080/api/health
 
 ## Administrator setup
 
@@ -69,7 +69,7 @@ To run the Android MAUI app, configure provider keys on the server, start the St
 
 The worksheet in `docs/` is a draft. It labels user needs as hypotheses and includes tasks for gathering real student feedback; it has not been copied into the linked Miro board or validated with participants.
 
-The Week 6 proposal document summarizes the slide requirements and maps them to the current prototype. It includes unvalidated user stories, a draft MoSCoW list, an architecture diagram, and a phased plan. Interview evidence, peer critique, and the authenticated mobile account-read spike are still outstanding.
+The Week 6 proposal document summarizes the slide requirements and maps them to the current prototype. It includes unvalidated user stories, a draft MoSCoW list, an architecture diagram, and a phased plan. The authenticated mobile demo-ledger reads and demo transfer are implemented, and a limited secure offline read cache is now included; the Android walkthrough, offline/reconnect verification, student interviews, peer critique, deployment, and assessment evidence are still outstanding. Do not present desk review as participant feedback.
 
 ## Notes
 

@@ -38,6 +38,14 @@ public partial class AccountsPage : ContentPage
             var accounts = await api.GetAccountsAsync();
             DemoAccounts.Clear();
             foreach (var account in accounts) DemoAccounts.Add(account);
+            var offline = api.LastLedgerReadWasOffline;
+            LedgerStatus.IsVisible = offline;
+            LedgerStatus.Text = offline
+                ? $"Offline · showing saved StudentBank demo balances from {api.LastOfflineLedgerSave?.ToLocalTime():dd MMM, HH:mm}. Changes are disabled until online."
+                : "";
+            CreateAccountButton.IsEnabled = !offline;
+            ConnectBankButton.IsEnabled = !offline;
+            FinishConnectButton.IsEnabled = !offline;
         }
         catch (Exception exception)
         {

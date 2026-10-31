@@ -19,6 +19,18 @@ public partial class TransferPage : ContentPage
             accounts = await api.GetAccountsAsync();
             FromPicker.ItemsSource = accounts;
             if (accounts.Count > 0) FromPicker.SelectedIndex = 0;
+            ReviewTransferButton.IsEnabled = !api.LastLedgerReadWasOffline;
+            if (api.LastLedgerReadWasOffline)
+            {
+                StatusLabel.Text = $"Offline · saved demo data from {api.LastOfflineLedgerSave?.ToLocalTime():dd MMM, HH:mm}. Transfers require a connection.";
+                StatusLabel.TextColor = Color.FromArgb("#8A5A00");
+                StatusLabel.IsVisible = true;
+            }
+            else
+            {
+                StatusLabel.IsVisible = false;
+                StatusLabel.TextColor = Color.FromArgb("#A33A32");
+            }
         }
         catch (Exception exception)
         {
